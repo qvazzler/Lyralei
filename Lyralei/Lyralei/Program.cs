@@ -6,12 +6,24 @@ using System.Threading.Tasks;
 
 namespace Lyralei
 {
-    class Program
-    {
-        //Based on guide, unfinished so far: https://docs.efproject.net/en/latest/platforms/full-dotnet/new-db.html
-
-        static void Main(string[] args)
+        //Based on guide: https://docs.efproject.net/en/latest/platforms/full-dotnet/new-db.html
+        class Program
         {
+            static void Main(string[] args)
+            {
+                using (var db = new BloggingContext())
+                {
+                    db.Blogs.Add(new Blog { Url = "http://blogs.msdn.com/adonet" });
+                    var count = db.SaveChanges();
+                    Console.WriteLine("{0} records saved to database", count);
+
+                    Console.WriteLine();
+                    Console.WriteLine("All blogs in database:");
+                    foreach (var blog in db.Blogs)
+                    {
+                        Console.WriteLine(" - {0}", blog.Url);
+                    }
+                }
+            }
         }
     }
-}
