@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace Lyralei
 {
-    public class BloggingContext : DbContext
+    public class AlleriaContext : DbContext
     {
-        public DbSet<Blog> Blogs { get; set; }
-        public DbSet<Post> Posts { get; set; }
+        //public DbSet<Blog> Blog { get; set; }
+        //public DbSet<Post> Posts { get; set; }
+        public DbSet<Models.Subscribers> Subscribers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -20,27 +21,18 @@ namespace Lyralei
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Make Blog.Url required
-            modelBuilder.Entity<Blog>()
-                .Property(b => b.Url)
+            modelBuilder.Entity<Models.Subscribers>()
+                .Property(b => b.ServerIp)
                 .IsRequired();
         }
     }
 
-    public class Blog
+    public static class AlleriaContextUtils
     {
-        public int BlogId { get; set; }
-        public string Url { get; set; }
-
-        public List<Post> Posts { get; set; }
-    }
-
-    public class Post
-    {
-        public int PostId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-
-        public int BlogId { get; set; }
-        public Blog Blog { get; set; }
+        //Model-cleaner
+        public static void Clear<T>(this DbSet<T> dbSet) where T : Models.Subscribers
+        {
+            dbSet.RemoveRange(dbSet);
+        }
     }
 }
