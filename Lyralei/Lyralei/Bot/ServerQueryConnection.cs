@@ -145,18 +145,24 @@ namespace Lyralei.Bot
 
         private void registerEvents()
         {
-            //queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
-            //queryRunner.Notifications.ClientJoined += Notifications_ClientJoined;
-            //queryRunner.Notifications.ClientMoveForced += Notifications_ClientMoveForced;
-            //queryRunner.Notifications.ClientDisconnect += Notifications_ClientDisconnect;
-            //queryRunner.Notifications.ClientConnectionLost += Notifications_ClientConnectionLost;
-            //queryRunner.Notifications.ServerMessageReceived += Notifications_ServerMessageReceived;
-            //queryRunner.Notifications.ChannelMessageReceived += Notifications_ChannelMessageReceived;
-            //queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
             queryRunner.UnknownNotificationReceived += Notifications_UnknownNotificationReceived;
-            //queryRunner.Notifications.ClientBan += Notifications_ClientBan;
-            //queryRunner.Notifications.ClientMovedByTemporaryChannelCreate += Notifications_ClientMovedByTemporaryChannelCreate;
-            //queryRunner.Notifications.ClientKick += Notifications_ClientKick;
+
+            queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
+            queryRunner.Notifications.ClientJoined += Notifications_ClientJoined;
+            queryRunner.Notifications.ClientMoveForced += Notifications_ClientMoveForced;
+            queryRunner.Notifications.ClientDisconnect += Notifications_ClientDisconnect;
+            queryRunner.Notifications.ClientConnectionLost += Notifications_ClientConnectionLost;
+            queryRunner.Notifications.ServerMessageReceived += Notifications_ServerMessageReceived;
+            queryRunner.Notifications.ChannelMessageReceived += Notifications_ChannelMessageReceived;
+            queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
+
+            queryRunner.Notifications.ClientBan += Notifications_ClientBan;
+            queryRunner.Notifications.ClientMovedByTemporaryChannelCreate += Notifications_ClientMovedByTemporaryChannelCreate;
+            queryRunner.Notifications.ClientKick += Notifications_ClientKick;
+
+            queryRunner.Notifications.ChannelCreated += Notifications_ChannelCreated;
+            queryRunner.Notifications.ChannelEdited += Notifications_ChannelEdited;
+            queryRunner.Notifications.ChannelMoved += Notifications_ChannelMoved;
 
 
             if (atd != null)
@@ -221,24 +227,24 @@ namespace Lyralei.Bot
                 string[] query = e.Value.ToString().Replace("\\/", "/").TrimEnd(new char[] { '\r', '\n' }).Split(' ');
 
                 //notifychannelcreated cid=3 cpid=0 channel_name=awdawd channel_codec_quality=6 channel_order=1 channel_codec_is_unencrypted=1 channel_flag_maxfamilyclients_unlimited=0 channel_flag_maxfamilyclients_inherited=1 invokerid=2 invokername=qvazzler invokeruid=sR\/12P6fJAJngNXQqK+JMA9CFuw=
-                if (query[0] == "notifychannelcreated")
-                {
-                        ChannelCreatedEventArgs args = new ChannelCreatedEventArgs(e.Value);
+                //if (query[0] == "notifychannelcreated")
+                //{
+                //        ChannelCreatedEventArgs args = new ChannelCreatedEventArgs(e.Value);
 
-                        //addonManager.addons.ForEach(f => f.onChannelCreated(sender, args));
-                }
-                else if (query[0] == "notifychannelmoved")
-                {
-                        ChannelMovedEventArgs args = new ChannelMovedEventArgs(e.Value);
+                //        //addonManager.addons.ForEach(f => f.onChannelCreated(sender, args));
+                //}
+                //else if (query[0] == "notifychannelmoved")
+                //{
+                //        ChannelMovedEventArgs args = new ChannelMovedEventArgs(e.Value);
 
-                        //addonManager.addons.ForEach(f => f.onChannelMoved(sender, args));
-                }
-                else if (query[0] == "notifychanneledited")
-                {
-                        ChannelEditedEventArgs args = new ChannelEditedEventArgs(e.Value);
+                //        //addonManager.addons.ForEach(f => f.onChannelMoved(sender, args));
+                //}
+                //else if (query[0] == "notifychanneledited")
+                //{
+                //        ChannelEditedEventArgs args = new ChannelEditedEventArgs(e.Value);
 
-                        //addonManager.addons.ForEach(f => f.onChannelEdited(sender, args));
-                }
+                //        //addonManager.addons.ForEach(f => f.onChannelEdited(sender, args));
+                //}
             }
             catch (Exception)
             {
@@ -252,93 +258,108 @@ namespace Lyralei.Bot
 
         //NO LONGER NEEDED
 
+        private void Notifications_ChannelMoved(object sender, ChannelMovedEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Notifications_ChannelEdited(object sender, ChannelEditedEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Notifications_ChannelCreated(object sender, ChannelCreatedEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
         ////Server message
-        //private void Notifications_ServerMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
-        //{
-        //    addonManager.addons.ForEach(f => f.onServerMessage(sender, e));
-        //}
+        private void Notifications_ServerMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
+        {
+            addonManager.addons.ForEach(f => f.onServerMessage(sender, e));
+        }
 
-        ////Channel message
-        //private void Notifications_ChannelMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
-        //{
-        //    addonManager.addons.ForEach(f => f.onChannelMessage(sender, e));
-        //}
+        //Channel message
+        private void Notifications_ChannelMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
+        {
+            addonManager.addons.ForEach(f => f.onChannelMessage(sender, e));
+        }
 
-        ////Client message
-        //private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
-        //{
-        //    //For now don't use any old command parser
-        //    addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
-        //}
+        //Client message
+        private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
+        {
+            //For now don't use any old command parser
+            addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
+        }
 
-        ////Client disconnected from server
-        //private void Notifications_ClientDisconnect(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientDisconnectEventArgs e)
-        //{
-        //    addonManager.addons.ForEach(f => f.onClientDisconnect(sender, e));
-        //}
+        //Client disconnected from server
+        private void Notifications_ClientDisconnect(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientDisconnectEventArgs e)
+        {
+            addonManager.addons.ForEach(f => f.onClientDisconnect(sender, e));
+        }
 
-        ////Client joins server
-        //private void Notifications_ClientJoined(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientJoinedEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientJoined(sender, e));
-        //    }
-        //}
+        //Client joins server
+        private void Notifications_ClientJoined(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientJoinedEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientJoined(sender, e));
+            }
+        }
 
-        ////Client is kicked
-        //private void Notifications_ClientKick(object sender, ClientKickEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientKick(sender, e));
-        //    }
-        //}
+        //Client is kicked
+        private void Notifications_ClientKick(object sender, ClientKickEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientKick(sender, e));
+            }
+        }
 
-        ////Client moved by temporary channel (double-evented)
-        //private void Notifications_ClientMovedByTemporaryChannelCreate(object sender, ClientMovedEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientMovedByTemporaryChannelCreate(sender, e));
-        //    }
-        //}
+        //Client moved by temporary channel (double-evented)
+        private void Notifications_ClientMovedByTemporaryChannelCreate(object sender, ClientMovedEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientMovedByTemporaryChannelCreate(sender, e));
+            }
+        }
 
-        ////Client moved by mod/admin (double-evented) x
-        //private void Notifications_ClientMoveForced(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedByClientEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientMoveForced(sender, e));
-        //    }
-        //}
+        //Client moved by mod/admin (double-evented) x
+        private void Notifications_ClientMoveForced(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedByClientEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientMoveForced(sender, e));
+            }
+        }
 
-        ////Client moved (double-evented) x
-        //private void Notifications_ClientMoved(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientMoved(sender, e));
-        //    }
-        //}
+        //Client moved (double-evented) x
+        private void Notifications_ClientMoved(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientMoved(sender, e));
+            }
+        }
 
-        ////Client banned from server
-        //private void Notifications_ClientBan(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientBanEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientBan(sender, e));
-        //    }
-        //}
+        //Client banned from server
+        private void Notifications_ClientBan(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientBanEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientBan(sender, e));
+            }
+        }
 
-        ////Client timed out
-        //private void Notifications_ClientConnectionLost(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientConnectionLostEventArgs e)
-        //{
-        //    if (doubleEventManager.IsDouble(e.GetDumpString()))
-        //    {
-        //        addonManager.addons.ForEach(f => f.onClientConnectionLost(sender, e));
-        //    }
-        //}
+        //Client timed out
+        private void Notifications_ClientConnectionLost(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientConnectionLostEventArgs e)
+        {
+            if (doubleEventManager.IsDouble(e.GetDumpString()))
+            {
+                addonManager.addons.ForEach(f => f.onClientConnectionLost(sender, e));
+            }
+        }
 
         #endregion
 
