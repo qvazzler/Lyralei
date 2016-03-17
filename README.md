@@ -27,7 +27,8 @@ Lyralei is meant to be handling many things, including but not limited to:
 1. Clone this repo
 2. Clone my other (forked) repo: https://github.com/qvazzler/TS3QueryLib.Net
 3. If needed, you'll have to build TS3QueryLib.NET and reference it properly in this repo (Lyralei).
-4. Contact me if needed
+4. Try to get a working debugging session going by connecting to your local teamspeak server.
+5. Contact me if needed
 
 # Goals of this project
 * Have a functioning bot with the bare minimums, running on windrunner.cc teamspeak 3 server
