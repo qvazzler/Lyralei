@@ -134,6 +134,7 @@
       <DependentUpon>20160317121024_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\AlleriaContextModelSnapshot.cs" />
+    <Compile Include="test.cs" />
     <Compile Include="TS3 Objects\Entities\Channel.cs" />
     <Compile Include="TS3 Objects\EventArguments\EventArguments.cs" />
     <Compile Include="Logging\Log.cs" />

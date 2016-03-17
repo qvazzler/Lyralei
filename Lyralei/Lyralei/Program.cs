@@ -56,6 +56,9 @@ namespace Lyralei
                     botConnections.Add(new BotConnection(subscriber));
                 }
             }
+
+            while (true)
+                Thread.Sleep(1000);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Lyralei.Bot
         public bool IsDouble(string eventValue)
         {
             //if (eventDumpStrings.Count(item => String.Join(" ", item) == String.Join(" ", eventDumpString)) == 2)
+            eventDumpStrings.Add(eventValue);
             if (eventDumpStrings.Count(item => item == eventValue) == 2)
             {
                 eventDumpStrings.RemoveAll(item => item == eventValue);
