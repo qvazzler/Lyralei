@@ -12,6 +12,7 @@ Lyralei is meant to be handling many things, including but not limited to:
 * MSSQL Express (or other) to run local databases.
 * Visual Studio 2015 Community Edition or other recent version.
 * .NET Framework 4.6.1
+* TeamSpeak 3 Server to mess with locally (here's one with password prepared: https://dl.dropboxusercontent.com/u/3782895/TeamSpeak%203%20Server.rar)
 
 # Knowledge areas of this project
 * TeamSpeak ServerQuery logic
