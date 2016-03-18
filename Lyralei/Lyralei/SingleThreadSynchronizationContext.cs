@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace SquallBot
+namespace Lyralei
 {
     public sealed class SingleThreadSynchronizationContext : SynchronizationContext
     {

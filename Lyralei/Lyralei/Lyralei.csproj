@@ -118,7 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
-    <Compile Include="Addons\Base\Addon.cs" />
+    <Compile Include="Addons\Base\AddonBase.cs" />
     <Compile Include="Addons\TestAddon.cs" />
     <Compile Include="AlleriaContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
@@ -127,7 +127,6 @@
     <Compile Include="Bot\Commands\BotCommandParam.cs" />
     <Compile Include="Bot\Commands\BotCommandPreface.cs" />
     <Compile Include="Bot\Commands\BotCommandPrefaceList.cs" />
-    <Compile Include="Bot\DoubleEventManager.cs" />
     <Compile Include="Bot\ServerQueryConnection.cs" />
     <Compile Include="Migrations\20160317121024_Initial.cs" />
     <Compile Include="Migrations\20160317121024_Initial.designer.cs">

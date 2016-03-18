@@ -64,9 +64,6 @@ namespace Lyralei.Bot
         //Threading-related
         SemaphoreSlim unknownEventQueue; //Used to keep track of double-events and streamline multi-threading to pseudo single-thread
 
-        //New shiz
-        DoubleEventManager doubleEventManager = new DoubleEventManager();
-
         public ServerQueryConnection(Models.Subscribers _subscriber/*, MySQLInstance _sql, AddonManager _addonManager*/)
         {
             subscriber = _subscriber;
@@ -94,16 +91,23 @@ namespace Lyralei.Bot
         void SetName(string nickname)
         {
             string result = "";
+            int attempts = 1;
+            string modnickname = nickname;
 
             do
             {
                 Command cmd = new Command("clientupdate");
-                cmd.AddParameter("client_nickname", "Squallbot");
+                cmd.AddParameter("client_nickname", modnickname);
 
                 result = queryRunner.SendCommand(cmd);
-                nickname += "1";
+                attempts += 1;
+                modnickname = nickname + attempts;
+
+                if (attempts > 100)
+                    throw new Exception(result);
+
             }
-            while (result.StartsWith("error id=513") == false); //Name taken
+            while (result.StartsWith("error id=513")); //Name taken
         }
 
         void SelectServer(Subscribers subscriber)
@@ -221,39 +225,20 @@ namespace Lyralei.Bot
         //Unknown or misc event
         private void Notifications_UnknownNotificationReceived(object sender, TS3QueryLib.Core.Common.EventArgs<string> e)
         {
-            try
-            {
-                unknownEventQueue.Wait();
-                string[] query = e.Value.ToString().Replace("\\/", "/").TrimEnd(new char[] { '\r', '\n' }).Split(' ');
+            //try
+            //{
+            //    unknownEventQueue.Wait();
+            //    string[] query = e.Value.ToString().Replace("\\/", "/").TrimEnd(new char[] { '\r', '\n' }).Split(' ');
 
-                //notifychannelcreated cid=3 cpid=0 channel_name=awdawd channel_codec_quality=6 channel_order=1 channel_codec_is_unencrypted=1 channel_flag_maxfamilyclients_unlimited=0 channel_flag_maxfamilyclients_inherited=1 invokerid=2 invokername=qvazzler invokeruid=sR\/12P6fJAJngNXQqK+JMA9CFuw=
-                //if (query[0] == "notifychannelcreated")
-                //{
-                //        ChannelCreatedEventArgs args = new ChannelCreatedEventArgs(e.Value);
+            //}
+            //catch (Exception)
+            //{
 
-                //        //addonManager.addons.ForEach(f => f.onChannelCreated(sender, args));
-                //}
-                //else if (query[0] == "notifychannelmoved")
-                //{
-                //        ChannelMovedEventArgs args = new ChannelMovedEventArgs(e.Value);
-
-                //        //addonManager.addons.ForEach(f => f.onChannelMoved(sender, args));
-                //}
-                //else if (query[0] == "notifychanneledited")
-                //{
-                //        ChannelEditedEventArgs args = new ChannelEditedEventArgs(e.Value);
-
-                //        //addonManager.addons.ForEach(f => f.onChannelEdited(sender, args));
-                //}
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                unknownEventQueue.Release();
-            }
+            //}
+            //finally
+            //{
+            //    unknownEventQueue.Release();
+            //}
         }
 
         //NO LONGER NEEDED
@@ -276,89 +261,68 @@ namespace Lyralei.Bot
         ////Server message
         private void Notifications_ServerMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            addonManager.addons.ForEach(f => f.onServerMessage(sender, e));
+            //addonManager.addons.ForEach(f => f.onServerMessage(sender, e));
         }
 
         //Channel message
         private void Notifications_ChannelMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            addonManager.addons.ForEach(f => f.onChannelMessage(sender, e));
+            //addonManager.addons.ForEach(f => f.onChannelMessage(sender, e));
         }
 
         //Client message
         private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
             //For now don't use any old command parser
-            addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
+            //addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
         }
 
         //Client disconnected from server
         private void Notifications_ClientDisconnect(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientDisconnectEventArgs e)
         {
-            addonManager.addons.ForEach(f => f.onClientDisconnect(sender, e));
+            //addonManager.addons.ForEach(f => f.onClientDisconnect(sender, e));
         }
 
         //Client joins server
         private void Notifications_ClientJoined(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientJoinedEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientJoined(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientJoined(sender, e));
         }
 
         //Client is kicked
         private void Notifications_ClientKick(object sender, ClientKickEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientKick(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientKick(sender, e));
         }
 
         //Client moved by temporary channel (double-evented)
         private void Notifications_ClientMovedByTemporaryChannelCreate(object sender, ClientMovedEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientMovedByTemporaryChannelCreate(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientMovedByTemporaryChannelCreate(sender, e));
         }
 
         //Client moved by mod/admin (double-evented) x
         private void Notifications_ClientMoveForced(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedByClientEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientMoveForced(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientMoveForced(sender, e));
         }
 
         //Client moved (double-evented) x
         private void Notifications_ClientMoved(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientMovedEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientMoved(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientMoved(sender, e));
         }
 
         //Client banned from server
         private void Notifications_ClientBan(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientBanEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientBan(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientBan(sender, e));
         }
 
         //Client timed out
         private void Notifications_ClientConnectionLost(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.ClientConnectionLostEventArgs e)
         {
-            if (doubleEventManager.IsDouble(e.GetDumpString()))
-            {
-                addonManager.addons.ForEach(f => f.onClientConnectionLost(sender, e));
-            }
+            //addonManager.addons.ForEach(f => f.onClientConnectionLost(sender, e));
         }
 
         #endregion

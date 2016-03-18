@@ -8,11 +8,11 @@ namespace Lyralei.Addons
 {
     public class AddonManager
     {
-        public List<Addon> addons;
+        public List<AddonBase> addons;
 
         public AddonManager()
         {
-            addons = new List<Addon>();
+            addons = new List<AddonBase>();
             addons.Add(new TestAddon());
         }
     }

@@ -21,7 +21,7 @@ using Lyralei.Bot.Commands;
 namespace Lyralei.Addons.Base
 {
     //The Addon base class assigns all the variables. This saves some space for creating multiple addon classes.
-    abstract public class Addon
+    abstract public class AddonBase
     {
         //public delegate void Sync_ClientMessageReceived(object source, MyEventArgs e);
 
@@ -34,12 +34,12 @@ namespace Lyralei.Addons.Base
         public SemaphoreSlim QueryQueue;
         //public BotCommandPrefaceList commandlist;
 
-        public Addon()
+        public AddonBase()
         {
 
         }
 
-        public Addon(ServerQueryConnection _serverQueryConnection, Models.Subscribers _subscriber)
+        public AddonBase(ServerQueryConnection _serverQueryConnection, Models.Subscribers _subscriber)
         {
             Load(_serverQueryConnection, _subscriber);
         }
