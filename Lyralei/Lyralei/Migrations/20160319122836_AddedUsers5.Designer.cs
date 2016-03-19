@@ -8,9 +8,10 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(AlleriaContext))]
-    partial class AlleriaContextModelSnapshot : ModelSnapshot
+    [Migration("20160319122836_AddedUsers5")]
+    partial class AddedUsers5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
@@ -50,7 +51,7 @@ namespace Lyralei.Migrations
 
                     b.Property<int>("SubscriberId");
 
-                    b.Property<string>("SubscriberUniqueId");
+                    b.Property<int>("UserTeamSpeakClientDatabaseId");
 
                     b.Property<string>("UserTeamSpeakClientUniqueId");
 

@@ -10,14 +10,13 @@ namespace Lyralei.Models
     public class Users
     {
         [Key]
-        public int UserId { get; set; }
+        public int UserId { get; private set; }
         public int SubscriberId { get; set; }
+        public string SubscriberUniqueId { get; set; }
 
         public string ServerQueryUsername { get; set; }
         public string ServerQueryPassword { get; set; }
 
-        public int UserTeamSpeakClientId { get; set; }
-        public int UserTeamSpeakClientDatabaseId { get; set; }
         public string UserTeamSpeakClientUniqueId { get; set; }
     }
 

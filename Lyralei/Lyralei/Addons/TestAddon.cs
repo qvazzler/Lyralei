@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Lyralei.Addons
 {
-    class TestAddon : AddonBase
+    class TestAddon : AddonBase, IAddon
     {
-        public void testing()
+        public void Initialize()
         {
-            //queryRunner
+
         }
     }
 }

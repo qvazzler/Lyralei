@@ -10,11 +10,25 @@ namespace Lyralei.Addons
     {
         public List<AddonBase> addons;
 
-        public AddonManager()
+        public AddonManager(Models.Subscribers subscriber, Bot.ServerQueryRootConnection serverQueryRootConnection)
         {
             addons = new List<AddonBase>();
-            addons.Add(new TestAddon());
-            addons.Add(new ServerQueryAddon());
+
+            var addon1 = new TestAddon();
+            var addon2 = new ServerQueryAddon();
+
+            addons.Add(addon1);
+            addons.Add(addon2);
+
+            foreach (AddonBase addon in addons)
+            {
+                addon.BaseInitialize(subscriber, serverQueryRootConnection);
+            }
+
+            foreach (IAddon addon in addons)
+            {
+                addon.Initialize();
+            }
         }
     }
 }

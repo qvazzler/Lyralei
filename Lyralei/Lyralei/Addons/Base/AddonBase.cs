@@ -25,9 +25,7 @@ namespace Lyralei.Addons.Base
     {
         //public delegate void Sync_ClientMessageReceived(object source, MyEventArgs e);
 
-        public List<string> eventDumpStrings; //This object is used to keep track of double-firing events in channel-related events.. Messy but works
-        public ServerQueryRootConnection serverQueryConnection;
-        //public MySQLInstance sql;
+        public ServerQueryRootConnection serverQueryRootConnection;
         public Models.Subscribers subscriber;
         public QueryRunner queryRunner;
         public AsyncTcpDispatcher atd;
@@ -39,21 +37,15 @@ namespace Lyralei.Addons.Base
 
         }
 
-        public AddonBase(ServerQueryRootConnection _serverQueryConnection, Models.Subscribers _subscriber)
-        {
-            Load(_serverQueryConnection, _subscriber);
-        }
-
-        public void Load(ServerQueryRootConnection _serverQueryConnection, Models.Subscribers _subscriber)
+        internal void BaseInitialize(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
         {
             //sql = _sql;
-            serverQueryConnection = _serverQueryConnection;
-            queryRunner = _serverQueryConnection.queryRunner;
-            atd = _serverQueryConnection.atd;
-            subscriber = _subscriber;
+            this.serverQueryRootConnection = serverQueryRootConnection;
+            queryRunner = serverQueryRootConnection.queryRunner;
+            atd = serverQueryRootConnection.atd;
+            this.subscriber = subscriber;
             //QueryQueue = _serverQueryConnection.queryQueue;
             //commandlist = new BotCommandPrefaceList();
-            eventDumpStrings = new List<string>();
         }
 
         public virtual void onClientMessage(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e/*, BotCommandInput input, BotCommandPreface preface*/)

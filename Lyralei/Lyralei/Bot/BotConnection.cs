@@ -22,7 +22,7 @@ namespace Lyralei.Bot
     public class BotConnection
     {
         Models.Subscribers subscriber;
-        Addons.AddonManager addonManager = new Addons.AddonManager();
+        Addons.AddonManager addonManager;
 
         public BotConnection()
         {
@@ -42,7 +42,7 @@ namespace Lyralei.Bot
                 Log.Instance.Debug("Connecting to " + subscriber.ServerIp + "..");
                 ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber);
 
-                
+                addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
             }
             catch (Exception ex)
             {

@@ -8,9 +8,10 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(AlleriaContext))]
-    partial class AlleriaContextModelSnapshot : ModelSnapshot
+    [Migration("20160319210648_AddedUsers8")]
+    partial class AddedUsers8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")

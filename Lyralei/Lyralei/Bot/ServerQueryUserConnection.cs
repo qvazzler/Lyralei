@@ -27,12 +27,7 @@ namespace Lyralei.Bot
     {
         public ServerQueryUserConnection(Models.Subscribers _subscriber, Models.Users _user) : base(_subscriber, _user)
         {
-            this.onServerQueryCommandIssue += ServerQueryUserConnection_onServerQueryCommandIssue;
-        }
 
-        private void ServerQueryUserConnection_onServerQueryCommandIssue(object sender, CommandParameterGroupList cmd)
-        {
-            
         }
     }
 }

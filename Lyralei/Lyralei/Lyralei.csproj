@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
     <Compile Include="Addons\Base\AddonBase.cs" />
+    <Compile Include="Addons\Base\IAddon.cs" />
     <Compile Include="Addons\ServerQueryAddon.cs" />
     <Compile Include="Addons\TestAddon.cs" />
     <Compile Include="AlleriaContext.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Bot\ServerQueryBaseConnection.cs" />
     <Compile Include="Bot\ServerQueryUserConnection.cs" />
     <Compile Include="Bot\ServerQueryRootConnection.cs" />
+    <Compile Include="Bot\UserManager.cs" />
     <Compile Include="Migrations\20160317121024_Initial.cs" />
     <Compile Include="Migrations\20160317121024_Initial.designer.cs">
       <DependentUpon>20160317121024_Initial.cs</DependentUpon>
@@ -150,6 +152,22 @@
     <Compile Include="Migrations\20160318113423_AddedUsers4.cs" />
     <Compile Include="Migrations\20160318113423_AddedUsers4.designer.cs">
       <DependentUpon>20160318113423_AddedUsers4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160319122836_AddedUsers5.cs" />
+    <Compile Include="Migrations\20160319122836_AddedUsers5.designer.cs">
+      <DependentUpon>20160319122836_AddedUsers5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160319123732_AddedUsers6.cs" />
+    <Compile Include="Migrations\20160319123732_AddedUsers6.designer.cs">
+      <DependentUpon>20160319123732_AddedUsers6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160319210218_AddedUsers7.cs" />
+    <Compile Include="Migrations\20160319210218_AddedUsers7.designer.cs">
+      <DependentUpon>20160319210218_AddedUsers7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160319210648_AddedUsers8.cs" />
+    <Compile Include="Migrations\20160319210648_AddedUsers8.designer.cs">
+      <DependentUpon>20160319210648_AddedUsers8.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\AlleriaContextModelSnapshot.cs" />
     <Compile Include="Models\Users.cs" />

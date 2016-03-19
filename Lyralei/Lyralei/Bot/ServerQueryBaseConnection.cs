@@ -20,10 +20,11 @@ using Lyralei.TS3_Objects.Entities;
 using Lyralei.Addons.Base;
 using Lyralei.Addons;
 using Lyralei.Models;
+using NLog;
 
 namespace Lyralei.Bot
 {
-    public class ServerQueryBaseConnection
+    public class ServerQueryBaseConnection : IDisposable
     {
         #region Semaphore-enabled Events
         //public event EventHandler<MessageReceivedEventArgs> Sync_ChannelMessageReceived;
@@ -40,6 +41,9 @@ namespace Lyralei.Bot
         //public event EventHandler<ChannelCreatedEventArgs> Sync_ChannelCreated; //Custom event
         #endregion
 
+        bool disposing = false;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         //Serverquery user information
         WhoAmIResponse whoAmI;
 
@@ -50,8 +54,7 @@ namespace Lyralei.Bot
         public delegate void StatusUpdateHandler(object sender, EventArgs e);
         public event StatusUpdateHandler ConnectionDown;
         public event StatusUpdateHandler ConnectionUp;
-        public delegate void ServerQueryCommandIssue(object sender, CommandParameterGroupList cmd);
-        public event ServerQueryCommandIssue onServerQueryCommandIssue;
+
 
         //Needed stuff for connection
         public AsyncTcpDispatcher atd;
@@ -65,6 +68,19 @@ namespace Lyralei.Bot
 
         //Threading-related
         SemaphoreSlim unknownEventQueue; //Used to keep track of double-events and streamline multi-threading to pseudo single-thread
+
+        public void Dispose()
+        {
+            if (disposing)
+                return;
+
+            disposing = true;
+
+            queryRunner.Logout();
+            atd.Disconnect();
+            queryRunner.Dispose();
+            atd.Dispose();
+        }
 
         public ServerQueryBaseConnection(Models.Subscribers _subscriber/*, MySQLInstance _sql, AddonManager _addonManager*/)
         {
@@ -181,7 +197,7 @@ namespace Lyralei.Bot
             }
             if (atd.Socket.Connected)
             {
-                //Connected!
+                logger.Info("Connected to server: {0}", subscriber.ServerIp);
             }
             else
             {
@@ -351,14 +367,14 @@ namespace Lyralei.Bot
         //Client message
         private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            //addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
-            if (e.Message.StartsWith("!"))
-            {
-                string cmd = e.Message.Remove(0, 1);
+            ////addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
+            //if (e.Message.StartsWith("!"))
+            //{
+            //    string cmd = e.Message.Remove(0, 1);
 
-                var cmdP = CommandParameterGroupList.Parse(cmd);
-                onServerQueryCommandIssue.Invoke(this, cmdP);
-            }
+            //    var cmdP = CommandParameterGroupList.Parse(cmd);
+            //    BotCommandReceived.Invoke(this, cmdP);
+            //}
         }
 
         //Client disconnected from server
