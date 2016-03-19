@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
     <Compile Include="Addons\Base\AddonBase.cs" />
+    <Compile Include="Addons\ServerQueryAddon.cs" />
     <Compile Include="Addons\TestAddon.cs" />
     <Compile Include="AlleriaContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
@@ -127,12 +128,31 @@
     <Compile Include="Bot\Commands\BotCommandParam.cs" />
     <Compile Include="Bot\Commands\BotCommandPreface.cs" />
     <Compile Include="Bot\Commands\BotCommandPrefaceList.cs" />
-    <Compile Include="Bot\ServerQueryConnection.cs" />
+    <Compile Include="Bot\ServerQueryBaseConnection.cs" />
+    <Compile Include="Bot\ServerQueryUserConnection.cs" />
+    <Compile Include="Bot\ServerQueryRootConnection.cs" />
     <Compile Include="Migrations\20160317121024_Initial.cs" />
     <Compile Include="Migrations\20160317121024_Initial.designer.cs">
       <DependentUpon>20160317121024_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20160318111449_AddedUsers.cs" />
+    <Compile Include="Migrations\20160318111449_AddedUsers.designer.cs">
+      <DependentUpon>20160318111449_AddedUsers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160318111632_AddedUsers2.cs" />
+    <Compile Include="Migrations\20160318111632_AddedUsers2.designer.cs">
+      <DependentUpon>20160318111632_AddedUsers2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160318112322_AddedUsers3.cs" />
+    <Compile Include="Migrations\20160318112322_AddedUsers3.designer.cs">
+      <DependentUpon>20160318112322_AddedUsers3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160318113423_AddedUsers4.cs" />
+    <Compile Include="Migrations\20160318113423_AddedUsers4.designer.cs">
+      <DependentUpon>20160318113423_AddedUsers4.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AlleriaContextModelSnapshot.cs" />
+    <Compile Include="Models\Users.cs" />
     <Compile Include="test.cs" />
     <Compile Include="TS3 Objects\Entities\Channel.cs" />
     <Compile Include="TS3 Objects\EventArguments\EventArguments.cs" />

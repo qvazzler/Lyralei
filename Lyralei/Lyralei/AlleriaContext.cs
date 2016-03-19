@@ -8,6 +8,7 @@ namespace Lyralei
         //public DbSet<Blog> Blog { get; set; }
         //public DbSet<Post> Posts { get; set; }
         public DbSet<Models.Subscribers> Subscribers { get; set; }
+        public DbSet<Models.Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

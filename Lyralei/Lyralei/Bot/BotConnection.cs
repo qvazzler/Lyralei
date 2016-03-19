@@ -40,7 +40,9 @@ namespace Lyralei.Bot
             {
                 subscriber = _subscriber;
                 Log.Instance.Debug("Connecting to " + subscriber.ServerIp + "..");
-                ServerQueryConnection serverQueryConnection = new ServerQueryConnection(subscriber);
+                ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber);
+
+                
             }
             catch (Exception ex)
             {

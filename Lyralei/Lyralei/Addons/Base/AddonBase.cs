@@ -26,7 +26,7 @@ namespace Lyralei.Addons.Base
         //public delegate void Sync_ClientMessageReceived(object source, MyEventArgs e);
 
         public List<string> eventDumpStrings; //This object is used to keep track of double-firing events in channel-related events.. Messy but works
-        public ServerQueryConnection serverQueryConnection;
+        public ServerQueryRootConnection serverQueryConnection;
         //public MySQLInstance sql;
         public Models.Subscribers subscriber;
         public QueryRunner queryRunner;
@@ -39,12 +39,12 @@ namespace Lyralei.Addons.Base
 
         }
 
-        public AddonBase(ServerQueryConnection _serverQueryConnection, Models.Subscribers _subscriber)
+        public AddonBase(ServerQueryRootConnection _serverQueryConnection, Models.Subscribers _subscriber)
         {
             Load(_serverQueryConnection, _subscriber);
         }
 
-        public void Load(ServerQueryConnection _serverQueryConnection, Models.Subscribers _subscriber)
+        public void Load(ServerQueryRootConnection _serverQueryConnection, Models.Subscribers _subscriber)
         {
             //sql = _sql;
             serverQueryConnection = _serverQueryConnection;

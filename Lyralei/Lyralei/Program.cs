@@ -40,9 +40,17 @@ namespace Lyralei
 
             using (var db = new AlleriaContext())
             {
+                /*
+                    qvazzler
+                    cWSwCRal
+
+                    Adam
+                    vm1wzFqU
+                */
+
                 if (db.Subscribers.Count(sub => sub.ServerIp == "localhost") == 0)
                 {
-                    db.Subscribers.Add(new Models.Subscribers { ServerIp = "localhost", AdminPassword = "password", AdminUsername = "serveradmin", ServerPort = 10011, VirtualServerId = 1 });
+                    db.Subscribers.Add(new Models.Subscribers { ServerIp = "localhost", AdminPassword = "eLy9P+eM", AdminUsername = "Adam", ServerPort = 10011, VirtualServerId = 1 });
                     var count = db.SaveChanges();
 
                     logger.Info("{0} records saved to database", count);

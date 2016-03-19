@@ -23,7 +23,7 @@ using Lyralei.Models;
 
 namespace Lyralei.Bot
 {
-    public class ServerQueryConnection
+    public class ServerQueryBaseConnection
     {
         #region Semaphore-enabled Events
         //public event EventHandler<MessageReceivedEventArgs> Sync_ChannelMessageReceived;
@@ -50,6 +50,8 @@ namespace Lyralei.Bot
         public delegate void StatusUpdateHandler(object sender, EventArgs e);
         public event StatusUpdateHandler ConnectionDown;
         public event StatusUpdateHandler ConnectionUp;
+        public delegate void ServerQueryCommandIssue(object sender, CommandParameterGroupList cmd);
+        public event ServerQueryCommandIssue onServerQueryCommandIssue;
 
         //Needed stuff for connection
         public AsyncTcpDispatcher atd;
@@ -64,7 +66,7 @@ namespace Lyralei.Bot
         //Threading-related
         SemaphoreSlim unknownEventQueue; //Used to keep track of double-events and streamline multi-threading to pseudo single-thread
 
-        public ServerQueryConnection(Models.Subscribers _subscriber/*, MySQLInstance _sql, AddonManager _addonManager*/)
+        public ServerQueryBaseConnection(Models.Subscribers _subscriber/*, MySQLInstance _sql, AddonManager _addonManager*/)
         {
             subscriber = _subscriber;
             //addonManager = _addonManager;
@@ -84,7 +86,31 @@ namespace Lyralei.Bot
             SetName("Lyralei");
             whoAmI = queryRunner.SendWhoAmI();
 
-            registerEvents();
+            RegisterEvents();
+            //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
+        }
+
+        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Models.Users _user)
+        {
+            subscriber = _subscriber;
+            //addonManager = _addonManager;
+            this.connectionChange = new AutoResetEvent(false);
+            unknownEventQueue = new SemaphoreSlim(1);
+            atd = new AsyncTcpDispatcher(subscriber.ServerIp, (ushort)subscriber.ServerPort);
+            queryRunner = new QueryRunner(atd);
+
+            //atd.ServerClosedConnection += atd_ServerClosedConnection;
+            atd.ReadyForSendingCommands += atd_ReadyForSendingCommands;
+            atd.SocketError += atd_SocketError;
+
+            Connect();
+            Login(subscriber);
+            SelectServer(subscriber);
+
+            SetName("Lyralei");
+            whoAmI = queryRunner.SendWhoAmI();
+
+            RegisterEvents();
             //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
         }
 
@@ -118,9 +144,25 @@ namespace Lyralei.Bot
                 throw new Exception(selectserver.ErrorMessage);
         }
 
+        void Login(string username, string password)
+        {
+            SimpleResponse login = queryRunner.Login(username, password);
+
+            if (login.IsErroneous == true)
+                throw new Exception(login.ErrorMessage);
+        }
+
+        void Login(Users user)
+        {
+            SimpleResponse login = queryRunner.Login(user.ServerQueryUsername, user.ServerQueryPassword);
+
+            if (login.IsErroneous == true)
+                throw new Exception(login.ErrorMessage);
+        }
+
         void Login(Subscribers subscriber)
         {
-            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
+            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, EscapeChars(subscriber.AdminPassword));
 
             if (login.IsErroneous == true)
                 throw new Exception(login.ErrorMessage);
@@ -147,9 +189,9 @@ namespace Lyralei.Bot
             }
         }
 
-        private void registerEvents()
+        public void RegisterEvents()
         {
-            queryRunner.UnknownNotificationReceived += Notifications_UnknownNotificationReceived;
+            queryRunner.UnknownNotificationReceived -= Notifications_UnknownNotificationReceived;
 
             queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
             queryRunner.Notifications.ClientJoined += Notifications_ClientJoined;
@@ -178,6 +220,42 @@ namespace Lyralei.Bot
                         SimpleResponse regNot = queryRunner.RegisterForNotifications(ServerNotifyRegisterEvent.Server);
                         regNot = queryRunner.RegisterForNotifications(ServerNotifyRegisterEvent.Channel, 0);
                         regNot = queryRunner.RegisterForNotifications(ServerNotifyRegisterEvent.TextPrivate);
+                    }
+                }
+            }
+        }
+
+        public void UnregisterEvents()
+        {
+            queryRunner.UnknownNotificationReceived -= Notifications_UnknownNotificationReceived;
+
+            queryRunner.Notifications.ClientMoved -= Notifications_ClientMoved;
+            queryRunner.Notifications.ClientJoined -= Notifications_ClientJoined;
+            queryRunner.Notifications.ClientMoveForced -= Notifications_ClientMoveForced;
+            queryRunner.Notifications.ClientDisconnect -= Notifications_ClientDisconnect;
+            queryRunner.Notifications.ClientConnectionLost -= Notifications_ClientConnectionLost;
+            queryRunner.Notifications.ServerMessageReceived -= Notifications_ServerMessageReceived;
+            queryRunner.Notifications.ChannelMessageReceived -= Notifications_ChannelMessageReceived;
+            queryRunner.Notifications.ClientMessageReceived -= Notifications_ClientMessageReceived;
+
+            queryRunner.Notifications.ClientBan -= Notifications_ClientBan;
+            queryRunner.Notifications.ClientMovedByTemporaryChannelCreate -= Notifications_ClientMovedByTemporaryChannelCreate;
+            queryRunner.Notifications.ClientKick -= Notifications_ClientKick;
+
+            queryRunner.Notifications.ChannelCreated -= Notifications_ChannelCreated;
+            queryRunner.Notifications.ChannelEdited -= Notifications_ChannelEdited;
+            queryRunner.Notifications.ChannelMoved -= Notifications_ChannelMoved;
+
+
+            if (atd != null)
+            {
+                if (atd.Socket != null)
+                {
+                    if (atd.Socket.Connected == true)
+                    {
+                        SimpleResponse regNot = queryRunner.UnregisterNotifications();
+                        //regNot = queryRunner.UnregisterNotifications(ServerNotifyRegisterEvent.Channel, 0);
+                        //regNot = queryRunner.UnregisterNotifications(ServerNotifyRegisterEvent.TextPrivate);
                     }
                 }
             }
@@ -273,8 +351,14 @@ namespace Lyralei.Bot
         //Client message
         private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            //For now don't use any old command parser
             //addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
+            if (e.Message.StartsWith("!"))
+            {
+                string cmd = e.Message.Remove(0, 1);
+
+                var cmdP = CommandParameterGroupList.Parse(cmd);
+                onServerQueryCommandIssue.Invoke(this, cmdP);
+            }
         }
 
         //Client disconnected from server

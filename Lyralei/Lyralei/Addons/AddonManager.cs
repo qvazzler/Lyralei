@@ -14,6 +14,7 @@ namespace Lyralei.Addons
         {
             addons = new List<AddonBase>();
             addons.Add(new TestAddon());
+            addons.Add(new ServerQueryAddon());
         }
     }
 }
