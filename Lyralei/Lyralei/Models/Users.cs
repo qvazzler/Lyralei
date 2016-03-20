@@ -14,8 +14,8 @@ namespace Lyralei.Models
         public int SubscriberId { get; set; }
         public string SubscriberUniqueId { get; set; }
 
-        public string ServerQueryUsername { get; set; }
-        public string ServerQueryPassword { get; set; }
+        //public string ServerQueryUsername { get; set; }
+        //public string ServerQueryPassword { get; set; }
 
         public string UserTeamSpeakClientUniqueId { get; set; }
     }

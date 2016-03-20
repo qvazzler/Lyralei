@@ -118,11 +118,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
-    <Compile Include="Addons\Base\AddonBase.cs" />
-    <Compile Include="Addons\Base\IAddon.cs" />
-    <Compile Include="Addons\ServerQueryAddon.cs" />
-    <Compile Include="Addons\TestAddon.cs" />
-    <Compile Include="AlleriaContext.cs" />
+    <Compile Include="Addons\ServerQuery\Hooks\CoreContext.cs" />
+    <Compile Include="Addons\ServerQuery\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Addons\Test\TestContext.cs" />
+    <Compile Include="Addons\Test\TestDataModel.cs" />
+    <Compile Include="Addons\_Base\AddonBase.cs" />
+    <Compile Include="Addons\_Base\IAddon.cs" />
+    <Compile Include="Addons\ServerQuery\ServerQueryAddon.cs" />
+    <Compile Include="Addons\Test\TestAddon.cs" />
+    <Compile Include="Addons\ServerQuery\Models\ServerQueryUserDetails.cs" />
+    <Compile Include="BaseContext.cs" />
+    <Compile Include="CoreContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
     <Compile Include="Bot\Commands\BotCommandBase.cs" />
     <Compile Include="Bot\Commands\BotCommandInput.cs" />
@@ -133,43 +139,24 @@
     <Compile Include="Bot\ServerQueryUserConnection.cs" />
     <Compile Include="Bot\ServerQueryRootConnection.cs" />
     <Compile Include="Bot\UserManager.cs" />
-    <Compile Include="Migrations\20160317121024_Initial.cs" />
-    <Compile Include="Migrations\20160317121024_Initial.designer.cs">
-      <DependentUpon>20160317121024_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\20160320194818_Initial.cs" />
+    <Compile Include="Migrations\20160320194818_Initial.designer.cs">
+      <DependentUpon>20160320194818_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160318111449_AddedUsers.cs" />
-    <Compile Include="Migrations\20160318111449_AddedUsers.designer.cs">
-      <DependentUpon>20160318111449_AddedUsers.cs</DependentUpon>
+    <Compile Include="Migrations\20160320195227_Initial2.cs" />
+    <Compile Include="Migrations\20160320195227_Initial2.designer.cs">
+      <DependentUpon>20160320195227_Initial2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160318111632_AddedUsers2.cs" />
-    <Compile Include="Migrations\20160318111632_AddedUsers2.designer.cs">
-      <DependentUpon>20160318111632_AddedUsers2.cs</DependentUpon>
+    <Compile Include="Migrations\20160320204112_Initial3.cs" />
+    <Compile Include="Migrations\20160320204112_Initial3.designer.cs">
+      <DependentUpon>20160320204112_Initial3.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160318112322_AddedUsers3.cs" />
-    <Compile Include="Migrations\20160318112322_AddedUsers3.designer.cs">
-      <DependentUpon>20160318112322_AddedUsers3.cs</DependentUpon>
+    <Compile Include="Migrations\20160320210212_Initial4.cs" />
+    <Compile Include="Migrations\20160320210212_Initial4.designer.cs">
+      <DependentUpon>20160320210212_Initial4.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20160318113423_AddedUsers4.cs" />
-    <Compile Include="Migrations\20160318113423_AddedUsers4.designer.cs">
-      <DependentUpon>20160318113423_AddedUsers4.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20160319122836_AddedUsers5.cs" />
-    <Compile Include="Migrations\20160319122836_AddedUsers5.designer.cs">
-      <DependentUpon>20160319122836_AddedUsers5.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20160319123732_AddedUsers6.cs" />
-    <Compile Include="Migrations\20160319123732_AddedUsers6.designer.cs">
-      <DependentUpon>20160319123732_AddedUsers6.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20160319210218_AddedUsers7.cs" />
-    <Compile Include="Migrations\20160319210218_AddedUsers7.designer.cs">
-      <DependentUpon>20160319210218_AddedUsers7.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20160319210648_AddedUsers8.cs" />
-    <Compile Include="Migrations\20160319210648_AddedUsers8.designer.cs">
-      <DependentUpon>20160319210648_AddedUsers8.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\AlleriaContextModelSnapshot.cs" />
+    <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
+    <Compile Include="ModelCustomizer.cs" />
     <Compile Include="Models\Users.cs" />
     <Compile Include="test.cs" />
     <Compile Include="TS3 Objects\Entities\Channel.cs" />

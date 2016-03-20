@@ -15,15 +15,33 @@ namespace Lyralei.Migrations
                 {
                     SubscriberId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AdminPassword = table.Column<string>(nullable: true),
-                    AdminUsername = table.Column<string>(nullable: true),
+                    AdminPassword = table.Column<string>(nullable: false),
+                    AdminUsername = table.Column<string>(nullable: false),
                     ServerIp = table.Column<string>(nullable: false),
                     ServerPort = table.Column<short>(nullable: false),
+                    SubscriberUniqueId = table.Column<string>(nullable: false),
                     VirtualServerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subscribers", x => x.SubscriberId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ServerQueryPassword = table.Column<string>(nullable: true),
+                    ServerQueryUsername = table.Column<string>(nullable: true),
+                    SubscriberId = table.Column<int>(nullable: false),
+                    SubscriberUniqueId = table.Column<string>(nullable: true),
+                    UserTeamSpeakClientUniqueId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.UserId);
                 });
         }
 
@@ -31,6 +49,9 @@ namespace Lyralei.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Subscribers");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

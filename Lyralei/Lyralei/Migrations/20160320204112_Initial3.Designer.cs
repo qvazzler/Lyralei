@@ -7,15 +7,37 @@ using Lyralei;
 
 namespace Lyralei.Migrations
 {
-    [DbContext(typeof(AlleriaContext))]
-    [Migration("20160318113423_AddedUsers4")]
-    partial class AddedUsers4
+    [DbContext(typeof(CoreContext))]
+    [Migration("20160320204112_Initial3")]
+    partial class Initial3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUserDetails", b =>
+                {
+                    b.ToTable("ServerQueryUserDetails");
+
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ServerQueryPassword");
+
+                    b.Property<int>("ServerQueryUserDetailsForeignKey");
+
+                    b.Property<string>("ServerQueryUsername");
+
+                    b.Property<int>("SubscriberId");
+
+                    b.Property<int?>("UsersUserId");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("UsersUserId");
+                });
 
             modelBuilder.Entity("Lyralei.Models.Subscribers", b =>
                 {
@@ -24,14 +46,19 @@ namespace Lyralei.Migrations
                     b.Property<int>("SubscriberId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AdminPassword");
+                    b.Property<string>("AdminPassword")
+                        .IsRequired();
 
-                    b.Property<string>("AdminUsername");
+                    b.Property<string>("AdminUsername")
+                        .IsRequired();
 
                     b.Property<string>("ServerIp")
                         .IsRequired();
 
                     b.Property<short>("ServerPort");
+
+                    b.Property<string>("SubscriberUniqueId")
+                        .IsRequired();
 
                     b.Property<int>("VirtualServerId");
 
@@ -45,19 +72,20 @@ namespace Lyralei.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ServerQueryPassword");
-
-                    b.Property<string>("ServerQueryUsername");
-
                     b.Property<int>("SubscriberId");
 
-                    b.Property<int>("UserTeamSpeakClientDatabaseId");
-
-                    b.Property<int>("UserTeamSpeakClientId");
+                    b.Property<string>("SubscriberUniqueId");
 
                     b.Property<string>("UserTeamSpeakClientUniqueId");
 
                     b.HasKey("UserId");
+                });
+
+            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUserDetails", b =>
+                {
+                    b.HasOne("Lyralei.Models.Users")
+                        .WithMany()
+                        .HasForeignKey("UsersUserId");
                 });
         }
     }

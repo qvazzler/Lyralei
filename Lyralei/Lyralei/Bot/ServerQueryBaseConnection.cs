@@ -61,6 +61,7 @@ namespace Lyralei.Bot
         public QueryRunner queryRunner;
         Subscribers subscriber;
         AddonManager addonManager;
+        Addons.ServerQuery.ServerQueryUserDetails serverQueryUser;
 
         //Timer-related stuff for connecting to the server
         public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
@@ -99,6 +100,8 @@ namespace Lyralei.Bot
             Login(subscriber);
             SelectServer(subscriber);
 
+            UpdateServerUniqueId();
+
             SetName("Lyralei");
             whoAmI = queryRunner.SendWhoAmI();
 
@@ -106,8 +109,10 @@ namespace Lyralei.Bot
             //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
         }
 
-        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Models.Users _user)
+        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user)
         {
+            serverQueryUser = _user;
+
             subscriber = _subscriber;
             //addonManager = _addonManager;
             this.connectionChange = new AutoResetEvent(false);
@@ -123,11 +128,30 @@ namespace Lyralei.Bot
             Login(subscriber);
             SelectServer(subscriber);
 
+            UpdateServerUniqueId();
+
             SetName("Lyralei");
             whoAmI = queryRunner.SendWhoAmI();
 
             RegisterEvents();
             //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
+        }
+
+        void UpdateServerUniqueId()
+        {
+            string uniqueId = queryRunner.GetServerInfo().UniqueId;
+
+            using (var db = new CoreContext())
+            {
+                Subscribers sub = db.Subscribers.Single(s => s.SubscriberId == subscriber.SubscriberId);
+                //using (SubscriberUniqueId
+                if (sub.SubscriberUniqueId != uniqueId)
+                {
+                    sub.SubscriberUniqueId = uniqueId;
+
+                    db.SaveChanges();
+                }
+            }
         }
 
         void SetName(string nickname)
@@ -160,6 +184,14 @@ namespace Lyralei.Bot
                 throw new Exception(selectserver.ErrorMessage);
         }
 
+        public void Login()
+        {
+            SimpleResponse login = queryRunner.Login(serverQueryUser.ServerQueryUsername, serverQueryUser.ServerQueryPassword);
+
+            if (login.IsErroneous == true)
+                throw new Exception(login.ErrorMessage);
+        }
+
         void Login(string username, string password)
         {
             SimpleResponse login = queryRunner.Login(username, password);
@@ -168,7 +200,7 @@ namespace Lyralei.Bot
                 throw new Exception(login.ErrorMessage);
         }
 
-        void Login(Users user)
+        void Login(Addons.ServerQuery.ServerQueryUserDetails user)
         {
             SimpleResponse login = queryRunner.Login(user.ServerQueryUsername, user.ServerQueryPassword);
 

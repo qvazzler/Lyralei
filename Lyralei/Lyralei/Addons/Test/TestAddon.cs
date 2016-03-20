@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lyralei.Addons
+namespace Lyralei.Addons.Test
 {
     class TestAddon : AddonBase, IAddon
     {
         public void Initialize()
         {
-
+            //Custom initialization
         }
     }
 }

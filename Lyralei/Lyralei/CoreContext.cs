@@ -1,9 +1,10 @@
 ﻿using Microsoft.Data.Entity;
+using System;
 using System.Collections.Generic;
 
 namespace Lyralei
 {
-    public class AlleriaContext : DbContext
+    public partial class CoreContext : DbContext
     {
         //public DbSet<Blog> Blog { get; set; }
         //public DbSet<Post> Posts { get; set; }
@@ -12,6 +13,8 @@ namespace Lyralei
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            //EnableSensitiveDataLogging();
+            optionsBuilder.EnableSensitiveDataLogging();
             // Visual Studio 2015 | Use the LocalDb 12 instance created by Visual Studio
             optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.ConsoleApp.NewDb;Trusted_Connection=True;");
 
@@ -25,15 +28,24 @@ namespace Lyralei
             modelBuilder.Entity<Models.Subscribers>()
                 .Property(b => b.ServerIp)
                 .IsRequired();
+
+            ModelCustomizer._modelCustomization.ForEach(x => x.Invoke(modelBuilder));
         }
     }
 
-    public static class AlleriaContextUtils
+    public static class CoreContextUtils
     {
         //Model-cleaner
-        public static void Clear<T>(this DbSet<T> dbSet) where T : Models.Subscribers
+        public static void Clear<T>(this DbSet<T> dbSet) where T : class
         {
             dbSet.RemoveRange(dbSet);
         }
+
+        //Borked?
+        //public static T AddIfNotExists<T>(this DbSet<T> dbSet, T entity, Expression<Func<T, bool>> predicate = null) where T : class, new()
+        //{
+        //    var exists = predicate != null ? dbSet.Any(predicate) : dbSet.Any();
+        //    return !exists ? dbSet.Add(entity) : null;
+        //}
     }
 }

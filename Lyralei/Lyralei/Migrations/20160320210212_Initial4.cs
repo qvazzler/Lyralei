@@ -4,21 +4,21 @@ using Microsoft.Data.Entity.Migrations;
 
 namespace Lyralei.Migrations
 {
-    public partial class AddedUsers3 : Migration
+    public partial class Initial4 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "ServerQueryPassword",
-                table: "Users",
+                name: "SubscriberUniqueId",
+                table: "Subscribers",
                 nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<short>(
-                name: "ServerQueryPassword",
-                table: "Users",
+            migrationBuilder.AlterColumn<string>(
+                name: "SubscriberUniqueId",
+                table: "Subscribers",
                 nullable: false);
         }
     }

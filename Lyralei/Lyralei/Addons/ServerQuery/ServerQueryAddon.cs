@@ -9,13 +9,17 @@ using TS3QueryLib.Core.CommandHandling;
 using TS3QueryLib.Core.Server;
 using TS3QueryLib.Core.Server.Notification.EventArgs;
 
-namespace Lyralei.Addons
+using Microsoft.Data.Entity;
+
+namespace Lyralei.Addons.ServerQuery
 {
-    class ServerQueryAddon : AddonBase, IAddon 
+    class ServerQueryAddon : AddonBase, IAddon
     {
         public void Initialize()
         {
             this.serverQueryRootConnection.BotCommandReceived += onBotCommand;
+
+            ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
         }
 
         private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)
@@ -30,6 +34,7 @@ namespace Lyralei.Addons
             {
                 try
                 {
+
                     //CommandParameter cmdP;
                     //if ((cmdP = cmdPG.SingleOrDefault(x => x.Name == "action")) != null)
                     //{
@@ -43,13 +48,46 @@ namespace Lyralei.Addons
                     //TODO: DO PROPER RECOGNITION FOR NOT BEING REGISTERED!!! DO REGISTER
                     if (cmdPG.Exists(cmdP => cmdP.Name.ToLower() == "action" && cmdP.Value.ToLower() == "register"))
                     {
-                        var username = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "username").Value;
-                        var password = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "password").Value;
+                        CommandParameter Username = null;
+                        CommandParameter Password = null;
 
-                        var serverUniqueId = queryRunner.GetServerInfo().UniqueId;
+                        if (cmdPG.Exists(cmdP => (Username = cmdP).Name.ToLower() == "username") && cmdPG.Exists(cmdP => (Password = cmdP).Name.ToLower() == "password"))
+                        {
+                            using (var db = new CoreContext())
+                            {
+                                    var user = userManager.QueryUser(subscriber.SubscriberId, subscriber.SubscriberUniqueId, e.InvokerUniqueId);
 
-                        var uniqueId = e.InvokerUniqueId;
-                        var databaseId = queryRunner.GetClientDatabaseIdsByUniqueId(uniqueId);
+                                    ServerQueryUserDetails sqUser = new ServerQueryUserDetails()
+                                    {
+                                        UserId = user.UserId,
+                                        SubscriberId = user.SubscriberId,
+                                        ServerQueryUsername = Username.Value,
+                                        ServerQueryPassword = Password.Value,
+                                    };
+
+                                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriber, sqUser);
+
+                                try
+                                {
+                                    serverQueryUserConnection.Login();
+
+                                    db.ServerQueryUserDetails.Add(sqUser);
+                                    db.SaveChanges();
+                                }
+                                catch (Exception)
+                                {
+                                    this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "Error, please check your command and try again.");
+                                }
+                            }
+
+                            //var username = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "username").Value;
+                            //var password = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "password").Value;
+
+                            //var serverUniqueId = queryRunner.GetServerInfo().UniqueId;
+
+                            //var uniqueId = e.InvokerUniqueId;
+                            //var databaseId = queryRunner.GetClientDatabaseIdsByUniqueId(uniqueId);
+                        }
                     }
 
                     //if(cmdPG.Exists(cmdP =>
@@ -75,11 +113,16 @@ namespace Lyralei.Addons
             {
                 if (cmdName.ToString().ToLower() == cmd.Name.ToLower())
                 {
-                    Models.Users user = null;
+                    Lyralei.Addons.ServerQuery.ServerQueryUserDetails serverQueryUser = null;
 
                     try
                     {
-                        user = userManager.GetUserInformation(e.InvokerUniqueId);
+                        using (var db = new CoreContext())
+                        {
+                            //user = userManager.GetUser(e.InvokerUniqueId);
+                            var User = db.Users.Single(usr => usr.UserTeamSpeakClientUniqueId == e.InvokerUniqueId && usr.SubscriberUniqueId == subscriber.SubscriberUniqueId);
+                            serverQueryUser = db.ServerQueryUserDetails.Single(sqUser => sqUser.UserId == User.UserId);
+                        }
                     }
                     catch (Exception ex) when (ex.Message == "Sequence contains no elements")
                     {
@@ -94,7 +137,7 @@ namespace Lyralei.Addons
 
                     try
                     {
-                        string result = SendServerQueryCommand(cmd, user);
+                        string result = SendServerQueryCommand(cmd, serverQueryUser);
                         this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, result);
                     }
                     catch (Exception)
@@ -108,7 +151,7 @@ namespace Lyralei.Addons
             }
         }
 
-        private string SendServerQueryCommand(Command cmd, Models.Users user)
+        private string SendServerQueryCommand(Command cmd, Lyralei.Addons.ServerQuery.ServerQueryUserDetails user)
         {
             using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.subscriber, user))
             {

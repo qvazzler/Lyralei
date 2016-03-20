@@ -24,7 +24,7 @@ namespace Lyralei
 
             List<BotConnection> botConnections = new List<BotConnection>();
 
-            using (var db = new AlleriaContext())
+            using (var db = new CoreContext())
             {
                 if (args.Contains("deletedb"))
                 {
@@ -38,7 +38,7 @@ namespace Lyralei
                 }
             }
 
-            using (var db = new AlleriaContext())
+            using (var db = new CoreContext())
             {
                 /*
                     qvazzler
@@ -50,7 +50,13 @@ namespace Lyralei
 
                 if (db.Subscribers.Count(sub => sub.ServerIp == "localhost") == 0)
                 {
-                    db.Subscribers.Add(new Models.Subscribers { ServerIp = "localhost", AdminPassword = "eLy9P+eM", AdminUsername = "Adam", ServerPort = 10011, VirtualServerId = 1 });
+                    db.Subscribers.Add(new Models.Subscribers {
+                        ServerIp = "localhost",
+                        AdminPassword = "eLy9P+eM",
+                        AdminUsername = "Adam",
+                        ServerPort = 10011,
+                        VirtualServerId = 1,
+                    });
                     var count = db.SaveChanges();
 
                     logger.Info("{0} records saved to database", count);

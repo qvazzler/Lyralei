@@ -7,9 +7,9 @@ using Lyralei;
 
 namespace Lyralei.Migrations
 {
-    [DbContext(typeof(AlleriaContext))]
-    [Migration("20160319122836_AddedUsers5")]
-    partial class AddedUsers5
+    [DbContext(typeof(CoreContext))]
+    [Migration("20160320194818_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,14 +24,19 @@ namespace Lyralei.Migrations
                     b.Property<int>("SubscriberId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AdminPassword");
+                    b.Property<string>("AdminPassword")
+                        .IsRequired();
 
-                    b.Property<string>("AdminUsername");
+                    b.Property<string>("AdminUsername")
+                        .IsRequired();
 
                     b.Property<string>("ServerIp")
                         .IsRequired();
 
                     b.Property<short>("ServerPort");
+
+                    b.Property<string>("SubscriberUniqueId")
+                        .IsRequired();
 
                     b.Property<int>("VirtualServerId");
 
@@ -51,7 +56,7 @@ namespace Lyralei.Migrations
 
                     b.Property<int>("SubscriberId");
 
-                    b.Property<int>("UserTeamSpeakClientDatabaseId");
+                    b.Property<string>("SubscriberUniqueId");
 
                     b.Property<string>("UserTeamSpeakClientUniqueId");
 

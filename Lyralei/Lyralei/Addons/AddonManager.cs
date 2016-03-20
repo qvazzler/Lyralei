@@ -14,11 +14,8 @@ namespace Lyralei.Addons
         {
             addons = new List<AddonBase>();
 
-            var addon1 = new TestAddon();
-            var addon2 = new ServerQueryAddon();
-
-            addons.Add(addon1);
-            addons.Add(addon2);
+            addons.Add(new Test.TestAddon());
+            addons.Add(new ServerQuery.ServerQueryAddon());
 
             foreach (AddonBase addon in addons)
             {
