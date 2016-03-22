@@ -61,7 +61,6 @@ namespace Lyralei.Bot
         public QueryRunner queryRunner;
         Subscribers subscriber;
         AddonManager addonManager;
-        Addons.ServerQuery.ServerQueryUserDetails serverQueryUser;
 
         //Timer-related stuff for connecting to the server
         public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
@@ -83,10 +82,40 @@ namespace Lyralei.Bot
             atd.Dispose();
         }
 
-        public ServerQueryBaseConnection(Models.Subscribers _subscriber/*, MySQLInstance _sql, AddonManager _addonManager*/)
+        public ServerQueryBaseConnection()
+        {
+
+        }
+
+        public ServerQueryBaseConnection(Models.Subscribers _subscriber, bool autoconnect = false)
+        {
+            UpdateSubscriberInfo(_subscriber, null);
+
+            if (autoconnect)
+                Initialize();
+        }
+
+        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user, bool autoconnect = false)
+        {
+            UpdateSubscriberInfo(_subscriber, _user);
+
+            if (autoconnect)
+                Initialize();
+        }
+
+        public void UpdateSubscriberInfo(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user)
         {
             subscriber = _subscriber;
-            //addonManager = _addonManager;
+
+            if (_user != null)
+            {
+                _subscriber.AdminUsername = _user.ServerQueryUsername;
+                _subscriber.AdminPassword = _user.ServerQueryPassword;
+            }
+        }
+
+        public void Initialize()
+        {
             this.connectionChange = new AutoResetEvent(false);
             unknownEventQueue = new SemaphoreSlim(1);
             atd = new AsyncTcpDispatcher(subscriber.ServerIp, (ushort)subscriber.ServerPort);
@@ -106,37 +135,8 @@ namespace Lyralei.Bot
             whoAmI = queryRunner.SendWhoAmI();
 
             RegisterEvents();
-            //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
         }
-
-        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user)
-        {
-            serverQueryUser = _user;
-
-            subscriber = _subscriber;
-            //addonManager = _addonManager;
-            this.connectionChange = new AutoResetEvent(false);
-            unknownEventQueue = new SemaphoreSlim(1);
-            atd = new AsyncTcpDispatcher(subscriber.ServerIp, (ushort)subscriber.ServerPort);
-            queryRunner = new QueryRunner(atd);
-
-            //atd.ServerClosedConnection += atd_ServerClosedConnection;
-            atd.ReadyForSendingCommands += atd_ReadyForSendingCommands;
-            atd.SocketError += atd_SocketError;
-
-            Connect();
-            Login(subscriber);
-            SelectServer(subscriber);
-
-            UpdateServerUniqueId();
-
-            SetName("Lyralei");
-            whoAmI = queryRunner.SendWhoAmI();
-
-            RegisterEvents();
-            //queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Channel, 1, "HI THAR!");
-        }
-
+        
         void UpdateServerUniqueId()
         {
             string uniqueId = queryRunner.GetServerInfo().UniqueId;
@@ -186,7 +186,7 @@ namespace Lyralei.Bot
 
         public void Login()
         {
-            SimpleResponse login = queryRunner.Login(serverQueryUser.ServerQueryUsername, serverQueryUser.ServerQueryPassword);
+            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
 
             if (login.IsErroneous == true)
                 throw new Exception(login.ErrorMessage);
@@ -216,8 +216,13 @@ namespace Lyralei.Bot
                 throw new Exception(login.ErrorMessage);
         }
 
-        void Connect()
+        public void Connect()
         {
+            Console.WriteLine(
+"Background Thread: SynchronizationContext.Current is " +
+(SynchronizationContext.Current != null ?
+SynchronizationContext.Current.ToString() : "null"));
+
             atd.Connect();
             connectionChange.WaitOne();
 

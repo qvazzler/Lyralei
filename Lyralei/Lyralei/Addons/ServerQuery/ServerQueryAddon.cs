@@ -10,6 +10,7 @@ using TS3QueryLib.Core.Server;
 using TS3QueryLib.Core.Server.Notification.EventArgs;
 
 using Microsoft.Data.Entity;
+using System.Threading;
 
 namespace Lyralei.Addons.ServerQuery
 {
@@ -67,9 +68,20 @@ namespace Lyralei.Addons.ServerQuery
 
                                 ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriber, sqUser);
 
+                                //serverQueryUserConnection.Initialize();
+
+                                Thread t = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.Initialize));
+                                t.Start();
+
+                                do
+                                {
+                                    Thread.Sleep(10);
+                                } while (t.ThreadState == ThreadState.Running);
+
                                 try
                                 {
-                                    serverQueryUserConnection.Login();
+                                    //TODO: We already logged in, so instead change this to a "whoami" command perhaps? To validate that the username matches or something maybe, not sure.
+                                    //serverQueryUserConnection.Login();
 
                                     db.ServerQueryUserDetails.Add(sqUser);
                                     db.SaveChanges();
@@ -149,6 +161,16 @@ namespace Lyralei.Addons.ServerQuery
 
                 break;
             }
+        }
+
+        private void blah(object state)
+        {
+            Console.WriteLine(
+     "Background Thread: SynchronizationContext.Current is " +
+     (SynchronizationContext.Current != null ?
+      SynchronizationContext.Current.ToString() : "null"));
+
+
         }
 
         private string SendServerQueryCommand(Command cmd, Lyralei.Addons.ServerQuery.ServerQueryUserDetails user)

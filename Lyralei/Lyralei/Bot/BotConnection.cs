@@ -38,9 +38,12 @@ namespace Lyralei.Bot
         {
             try
             {
+                //ServerQueryUserConnection serverQueryConnection1 = new ServerQueryUserConnection();
+                //serverQueryConnection1.Initialize(_subscriber);
+
                 subscriber = _subscriber;
                 Log.Instance.Debug("Connecting to " + subscriber.ServerIp + "..");
-                ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber);
+                ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber, true);
 
                 addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
             }
