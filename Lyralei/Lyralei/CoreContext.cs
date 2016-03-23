@@ -16,7 +16,7 @@ namespace Lyralei
             //EnableSensitiveDataLogging();
             optionsBuilder.EnableSensitiveDataLogging();
             // Visual Studio 2015 | Use the LocalDb 12 instance created by Visual Studio
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.ConsoleApp.NewDb;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Lyralei;Trusted_Connection=True;");
 
             // Visual Studio 2013 | Use the LocalDb 11 instance created by Visual Studio
             // optionsBuilder.UseSqlServer(@"Server=(localdb)\v11.0;Database=EFGetStarted.ConsoleApp.NewDb;Trusted_Connection=True;");

@@ -10,6 +10,20 @@ namespace Lyralei.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "ServerQueryUser",
+                columns: table => new
+                {
+                    ServerQueryUserId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ServerQueryPassword = table.Column<string>(nullable: true),
+                    ServerQueryUsername = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServerQueryUser", x => x.ServerQueryUserId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Subscribers",
                 columns: table => new
                 {
@@ -19,7 +33,7 @@ namespace Lyralei.Migrations
                     AdminUsername = table.Column<string>(nullable: false),
                     ServerIp = table.Column<string>(nullable: false),
                     ServerPort = table.Column<short>(nullable: false),
-                    SubscriberUniqueId = table.Column<string>(nullable: false),
+                    SubscriberUniqueId = table.Column<string>(nullable: true),
                     VirtualServerId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -33,8 +47,6 @@ namespace Lyralei.Migrations
                 {
                     UserId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ServerQueryPassword = table.Column<string>(nullable: true),
-                    ServerQueryUsername = table.Column<string>(nullable: true),
                     SubscriberId = table.Column<int>(nullable: false),
                     SubscriberUniqueId = table.Column<string>(nullable: true),
                     UserTeamSpeakClientUniqueId = table.Column<string>(nullable: true)
@@ -47,6 +59,9 @@ namespace Lyralei.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ServerQueryUser");
+
             migrationBuilder.DropTable(
                 name: "Subscribers");
 

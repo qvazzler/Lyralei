@@ -16,7 +16,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lyralei.Bot;
 using Lyralei.TS3_Objects.EventArguments;
-using Lyralei.Bot.Commands;
+
+using NLog;
 
 namespace Lyralei.Addons.Base
 {
@@ -32,9 +33,11 @@ namespace Lyralei.Addons.Base
         public SemaphoreSlim QueryQueue;
         //public BotCommandPrefaceList commandlist;
 
+        protected Logger logger;
+
         public AddonBase()
         {
-
+            logger = LogManager.GetCurrentClassLogger();
         }
 
         internal void BaseInitialize(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
@@ -51,6 +54,11 @@ namespace Lyralei.Addons.Base
         public virtual void onClientMessage(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e/*, BotCommandInput input, BotCommandPreface preface*/)
         {
 
+        }
+
+        protected void TextReply(MessageReceivedEventArgs e, string msg)
+        {
+            
         }
 
         //private void Notifications_UnknownNotificationReceived(object sender, TS3QueryLib.Core.Common.EventArgs<string> e)

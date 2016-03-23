@@ -8,8 +8,8 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(CoreContext))]
-    [Migration("20160320210212_Initial4")]
-    partial class Initial4
+    [Migration("20160323100840_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -17,26 +17,18 @@ namespace Lyralei.Migrations
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUserDetails", b =>
+            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUser", b =>
                 {
-                    b.ToTable("ServerQueryUserDetails");
+                    b.ToTable("ServerQueryUser");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("ServerQueryUserId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ServerQueryPassword");
 
-                    b.Property<int>("ServerQueryUserDetailsForeignKey");
-
                     b.Property<string>("ServerQueryUsername");
 
-                    b.Property<int>("SubscriberId");
-
-                    b.Property<int?>("UsersUserId");
-
-                    b.HasKey("UserId");
-
-                    b.HasIndex("UsersUserId");
+                    b.HasKey("ServerQueryUserId");
                 });
 
             modelBuilder.Entity("Lyralei.Models.Subscribers", b =>
@@ -78,13 +70,6 @@ namespace Lyralei.Migrations
                     b.Property<string>("UserTeamSpeakClientUniqueId");
 
                     b.HasKey("UserId");
-                });
-
-            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUserDetails", b =>
-                {
-                    b.HasOne("Lyralei.Models.Users")
-                        .WithMany()
-                        .HasForeignKey("UsersUserId");
                 });
         }
     }

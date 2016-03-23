@@ -35,18 +35,6 @@ namespace Lyralei.Addons.ServerQuery
             {
                 try
                 {
-
-                    //CommandParameter cmdP;
-                    //if ((cmdP = cmdPG.SingleOrDefault(x => x.Name == "action")) != null)
-                    //{
-                    //    if (cmdP.Value == "register")
-                    //    {
-
-                    //    }
-                    //}
-
-
-                    //TODO: DO PROPER RECOGNITION FOR NOT BEING REGISTERED!!! DO REGISTER
                     if (cmdPG.Exists(cmdP => cmdP.Name.ToLower() == "action" && cmdP.Value.ToLower() == "register"))
                     {
                         CommandParameter Username = null;
@@ -56,39 +44,68 @@ namespace Lyralei.Addons.ServerQuery
                         {
                             using (var db = new CoreContext())
                             {
-                                    var user = userManager.QueryUser(subscriber.SubscriberId, subscriber.SubscriberUniqueId, e.InvokerUniqueId);
+                                var user = userManager.QueryUser(subscriber.SubscriberId, subscriber.SubscriberUniqueId, e.InvokerUniqueId);
 
-                                    ServerQueryUserDetails sqUser = new ServerQueryUserDetails()
+                                Models.ServerQueryUser sqUser = new Models.ServerQueryUser()
+                                {
+                                    UserId = user.UserId,
+                                    Users = user,
+                                    //SubscriberId = user.SubscriberId,
+                                    ServerQueryUsername = Username.Value,
+                                    ServerQueryPassword = Password.Value,
+                                };
+
+                                Lyralei.Models.Subscribers subscriberUserCredentials = new Lyralei.Models.Subscribers()
                                     {
-                                        UserId = user.UserId,
-                                        SubscriberId = user.SubscriberId,
-                                        ServerQueryUsername = Username.Value,
-                                        ServerQueryPassword = Password.Value,
-                                    };
+                                    AdminPassword = sqUser.ServerQueryPassword,
+                                    AdminUsername = sqUser.ServerQueryUsername,
+                                    ServerIp = subscriber.ServerIp,
+                                    ServerPort = subscriber.ServerPort,
+                                    SubscriberId = subscriber.SubscriberId,
+                                    SubscriberUniqueId = subscriber.SubscriberUniqueId,
+                                    VirtualServerId = subscriber.VirtualServerId,
+                                };
 
-                                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriber, sqUser);
+                                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials);
 
                                 //serverQueryUserConnection.Initialize();
 
-                                Thread t = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.Initialize));
-                                t.Start();
+                                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                                thread.Start();
 
-                                do
-                                {
-                                    Thread.Sleep(10);
-                                } while (t.ThreadState == ThreadState.Running);
+                                thread.Join();
+
+                                //do
+                                //{
+                                //    Thread.Sleep(5);
+                                //} while (t.ThreadState == ThreadState.Running);
 
                                 try
                                 {
-                                    //TODO: We already logged in, so instead change this to a "whoami" command perhaps? To validate that the username matches or something maybe, not sure.
-                                    //serverQueryUserConnection.Login();
+                                    if (serverQueryUserConnection.atd.IsConnected)
+                                    {
+                                        var test = serverQueryUserConnection.whoAmI;
 
-                                    db.ServerQueryUserDetails.Add(sqUser);
-                                    db.SaveChanges();
+                                        if (test == null)
+                                            throw new Exception("Login failed");
+                                        if (test.IsErroneous)
+                                            throw new Exception(test.ResponseText);
+                                        else
+                                        {
+                                            db.ServerQueryUser.Add(sqUser);
+                                            db.SaveChanges();
+
+                                            serverQueryUserConnection.queryRunner.Logout();
+                                            serverQueryUserConnection.atd.Disconnect();
+
+                                            //User successfully registered
+                                            TextReply(e, "Successfully registered! You can now execute serverquery commands directly to me based on your user permissions.");
+                                        }
+                                    }
                                 }
                                 catch (Exception)
                                 {
-                                    this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "Error, please check your command and try again.");
+                                    TextReply(e, "Error, please check your command and try again.");
                                 }
                             }
 
@@ -117,7 +134,7 @@ namespace Lyralei.Addons.ServerQuery
                 }
                 catch (Exception ex)
                 {
-                    this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "Error, please check your command and try again.");
+                    TextReply(e, "Error, please check your command and try again.");
                 }
             }
 
@@ -125,7 +142,7 @@ namespace Lyralei.Addons.ServerQuery
             {
                 if (cmdName.ToString().ToLower() == cmd.Name.ToLower())
                 {
-                    Lyralei.Addons.ServerQuery.ServerQueryUserDetails serverQueryUser = null;
+                    Models.ServerQueryUser serverQueryUser = null;
 
                     try
                     {
@@ -133,17 +150,17 @@ namespace Lyralei.Addons.ServerQuery
                         {
                             //user = userManager.GetUser(e.InvokerUniqueId);
                             var User = db.Users.Single(usr => usr.UserTeamSpeakClientUniqueId == e.InvokerUniqueId && usr.SubscriberUniqueId == subscriber.SubscriberUniqueId);
-                            serverQueryUser = db.ServerQueryUserDetails.Single(sqUser => sqUser.UserId == User.UserId);
+                            serverQueryUser = db.ServerQueryUser.Single(sqUser => sqUser.Users.UserId == User.UserId);
                         }
                     }
                     catch (Exception ex) when (ex.Message == "Sequence contains no elements")
                     {
-                        this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "You do not have access to this command.");
+                        TextReply(e, "You do not have access to this command.");
                         return;
                     }
                     catch (Exception)
                     {
-                        this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "There was an error performing this command.");
+                        TextReply(e, "There was an error performing this command.");
                         return;
                     }
 
@@ -154,7 +171,7 @@ namespace Lyralei.Addons.ServerQuery
                     }
                     catch (Exception)
                     {
-                        this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "There was an error performing this command, or you lacked permissions.");
+                        TextReply(e, "There was an error performing this command, or you lacked permissions.");
                         return;
                     }
                 }
@@ -163,19 +180,9 @@ namespace Lyralei.Addons.ServerQuery
             }
         }
 
-        private void blah(object state)
+        private string SendServerQueryCommand(Command cmd, Models.ServerQueryUser user)
         {
-            Console.WriteLine(
-     "Background Thread: SynchronizationContext.Current is " +
-     (SynchronizationContext.Current != null ?
-      SynchronizationContext.Current.ToString() : "null"));
-
-
-        }
-
-        private string SendServerQueryCommand(Command cmd, Lyralei.Addons.ServerQuery.ServerQueryUserDetails user)
-        {
-            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.subscriber, user))
+            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.subscriber))
             {
                 return serverQueryUserConnection.queryRunner.SendCommand(cmd);
             }

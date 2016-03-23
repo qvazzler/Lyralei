@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Lyralei.Addons.ServerQuery;
 
+using Lyralei.Addons.ServerQuery.Models;
+
 namespace Lyralei
 {
     public partial class CoreContext : DbContext
     {
-        public DbSet<ServerQueryUserDetails> ServerQueryUserDetails { get; set; }
+        public DbSet<ServerQueryUser> ServerQueryUser { get; set; }
     }
 }

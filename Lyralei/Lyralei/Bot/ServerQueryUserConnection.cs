@@ -25,7 +25,7 @@ namespace Lyralei.Bot
 {
     public class ServerQueryUserConnection : ServerQueryBaseConnection
     {
-        public ServerQueryUserConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _squser, bool autoconnect = false) : base(_subscriber, _squser, autoconnect)
+        public ServerQueryUserConnection(Models.Subscribers _subscriber, bool autoconnect = false) : base(_subscriber, autoconnect)
         {
 
         }

@@ -52,8 +52,10 @@ namespace Lyralei
                 {
                     db.Subscribers.Add(new Models.Subscribers {
                         ServerIp = "localhost",
-                        AdminPassword = "eLy9P+eM",
+                        AdminPassword = "39e7jMad",
                         AdminUsername = "Adam",
+                        //AdminPassword = "password",
+                        //AdminUsername = "serveradmin",
                         ServerPort = 10011,
                         VirtualServerId = 1,
                     });

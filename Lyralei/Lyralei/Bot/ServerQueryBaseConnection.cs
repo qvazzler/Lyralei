@@ -45,7 +45,7 @@ namespace Lyralei.Bot
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         //Serverquery user information
-        WhoAmIResponse whoAmI;
+        public WhoAmIResponse whoAmI;
 
         //Command stuff
         public string commandPrefix;
@@ -60,10 +60,10 @@ namespace Lyralei.Bot
         public AsyncTcpDispatcher atd;
         public QueryRunner queryRunner;
         Subscribers subscriber;
-        AddonManager addonManager;
+        //AddonManager addonManager;
 
         //Timer-related stuff for connecting to the server
-        public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
+        //public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
         private AutoResetEvent connectionChange;
 
         //Threading-related
@@ -89,29 +89,29 @@ namespace Lyralei.Bot
 
         public ServerQueryBaseConnection(Models.Subscribers _subscriber, bool autoconnect = false)
         {
-            UpdateSubscriberInfo(_subscriber, null);
+            UpdateSubscriberInfo(_subscriber);
 
             if (autoconnect)
                 Initialize();
         }
 
-        public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user, bool autoconnect = false)
-        {
-            UpdateSubscriberInfo(_subscriber, _user);
+        //public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUser _user, bool autoconnect = false)
+        //{
+        //    UpdateSubscriberInfo(_subscriber);
 
-            if (autoconnect)
-                Initialize();
-        }
+        //    if (autoconnect)
+        //        Initialize();
+        //}
 
-        public void UpdateSubscriberInfo(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUserDetails _user)
+        public void UpdateSubscriberInfo(Models.Subscribers _subscriber)
         {
             subscriber = _subscriber;
 
-            if (_user != null)
-            {
-                _subscriber.AdminUsername = _user.ServerQueryUsername;
-                _subscriber.AdminPassword = _user.ServerQueryPassword;
-            }
+            //if (_user != null)
+            //{
+            //    _subscriber.AdminUsername = _user.ServerQueryUsername;
+            //    _subscriber.AdminPassword = _user.ServerQueryPassword;
+            //}
         }
 
         public void Initialize()
@@ -126,17 +126,38 @@ namespace Lyralei.Bot
             atd.SocketError += atd_SocketError;
 
             Connect();
-            Login(subscriber);
-            SelectServer(subscriber);
 
-            UpdateServerUniqueId();
+            SimpleResponse loginResult = Login();
 
-            SetName("Lyralei");
-            whoAmI = queryRunner.SendWhoAmI();
+            if (loginResult.IsBanned)
+                logger.Debug("User '{0}' login failure: {1}, {2}", subscriber.AdminUsername, subscriber.ServerIp, loginResult.ResponseText);
+            else if (loginResult.IsErroneous)
+                logger.Debug("User '{0}' login failure: {1}, {2}", subscriber.AdminUsername, subscriber.ServerIp, loginResult.ResponseText);
+            else
+            {
+                SelectServer(subscriber);
 
-            RegisterEvents();
+                UpdateServerUniqueId();
+
+                SetName("Lyralei");
+                whoAmI = queryRunner.SendWhoAmI();
+
+                RegisterEvents();
+            }
         }
-        
+
+        public void InitializeQuiet()
+        {
+            try
+            {
+                Initialize();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn("Could not initialize to: {0}", subscriber.ServerIp, ex);
+            }
+        }
+
         void UpdateServerUniqueId()
         {
             string uniqueId = queryRunner.GetServerInfo().UniqueId;
@@ -184,44 +205,46 @@ namespace Lyralei.Bot
                 throw new Exception(selectserver.ErrorMessage);
         }
 
-        public void Login()
+        public SimpleResponse Login()
         {
             SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
 
-            if (login.IsErroneous == true)
-                throw new Exception(login.ErrorMessage);
+            return login;
+
+            //if (login.IsErroneous == true)
+            //    throw new Exception(login.ErrorMessage);
         }
 
-        void Login(string username, string password)
-        {
-            SimpleResponse login = queryRunner.Login(username, password);
+        //void Login(string username, string password)
+        //{
+        //    SimpleResponse login = queryRunner.Login(username, password);
 
-            if (login.IsErroneous == true)
-                throw new Exception(login.ErrorMessage);
-        }
+        //    if (login.IsErroneous == true)
+        //        throw new Exception(login.ErrorMessage);
+        //}
 
-        void Login(Addons.ServerQuery.ServerQueryUserDetails user)
-        {
-            SimpleResponse login = queryRunner.Login(user.ServerQueryUsername, user.ServerQueryPassword);
+        //void Login(Addons.ServerQuery.ServerQueryUser user)
+        //{
+        //    SimpleResponse login = queryRunner.Login(user.ServerQueryUsername, user.ServerQueryPassword);
 
-            if (login.IsErroneous == true)
-                throw new Exception(login.ErrorMessage);
-        }
+        //    if (login.IsErroneous == true)
+        //        throw new Exception(login.ErrorMessage);
+        //}
 
-        void Login(Subscribers subscriber)
-        {
-            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, EscapeChars(subscriber.AdminPassword));
+        //void Login(Subscribers subscriber)
+        //{
+        //    SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, EscapeChars(subscriber.AdminPassword));
 
-            if (login.IsErroneous == true)
-                throw new Exception(login.ErrorMessage);
-        }
+        //    if (login.IsErroneous == true)
+        //        throw new Exception(login.ErrorMessage);
+        //}
 
         public void Connect()
         {
-            Console.WriteLine(
-"Background Thread: SynchronizationContext.Current is " +
-(SynchronizationContext.Current != null ?
-SynchronizationContext.Current.ToString() : "null"));
+            //Console.WriteLine(
+            //"Background Thread: SynchronizationContext.Current is " +
+            //(SynchronizationContext.Current != null ?
+            //SynchronizationContext.Current.ToString() : "null"));
 
             atd.Connect();
             connectionChange.WaitOne();
@@ -336,7 +359,7 @@ SynchronizationContext.Current.ToString() : "null"));
                 {
                     Thread.Sleep(5000);
                     Connect();
-                    Login(subscriber);
+                    Login();
 
                     //All is well, we can exit this function now
                     ConnectionUp.Invoke(this, new EventArgs());

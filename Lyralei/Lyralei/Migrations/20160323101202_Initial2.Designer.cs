@@ -8,14 +8,32 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(CoreContext))]
-    [Migration("20160320194818_Initial")]
-    partial class Initial
+    [Migration("20160323101202_Initial2")]
+    partial class Initial2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUser", b =>
+                {
+                    b.ToTable("ServerQueryUser");
+
+                    b.Property<int>("ServerQueryUserId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ServerQueryPassword");
+
+                    b.Property<string>("ServerQueryUsername");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("ServerQueryUserId");
+
+                    b.HasIndex("UserId");
+                });
 
             modelBuilder.Entity("Lyralei.Models.Subscribers", b =>
                 {
@@ -35,8 +53,7 @@ namespace Lyralei.Migrations
 
                     b.Property<short>("ServerPort");
 
-                    b.Property<string>("SubscriberUniqueId")
-                        .IsRequired();
+                    b.Property<string>("SubscriberUniqueId");
 
                     b.Property<int>("VirtualServerId");
 
@@ -50,10 +67,6 @@ namespace Lyralei.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ServerQueryPassword");
-
-                    b.Property<string>("ServerQueryUsername");
-
                     b.Property<int>("SubscriberId");
 
                     b.Property<string>("SubscriberUniqueId");
@@ -61,6 +74,14 @@ namespace Lyralei.Migrations
                     b.Property<string>("UserTeamSpeakClientUniqueId");
 
                     b.HasKey("UserId");
+                });
+
+            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUser", b =>
+                {
+                    b.HasOne("Lyralei.Models.Users")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
         }
     }
