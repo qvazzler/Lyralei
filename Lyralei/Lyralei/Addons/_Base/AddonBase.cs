@@ -58,7 +58,7 @@ namespace Lyralei.Addons.Base
 
         protected void TextReply(MessageReceivedEventArgs e, string msg)
         {
-            
+            this.queryRunner.SendTextMessage(TS3QueryLib.Core.CommandHandling.MessageTarget.Client, e.InvokerClientId, msg);
         }
 
         //private void Notifications_UnknownNotificationReceived(object sender, TS3QueryLib.Core.Common.EventArgs<string> e)
