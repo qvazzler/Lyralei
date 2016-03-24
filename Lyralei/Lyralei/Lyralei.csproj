@@ -118,17 +118,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
+    <Compile Include="Addons\InputOwner\Hooks\CoreContext.cs" />
+    <Compile Include="Addons\InputOwner\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Addons\InputOwner\Models\InputOwners.cs" />
+    <Compile Include="Addons\InputOwner\InputOwnerAddon.cs" />
+    <Compile Include="Addons\InputOwner\Props\PriorityLevel.cs" />
     <Compile Include="Addons\ServerQuery\Hooks\CoreContext.cs" />
     <Compile Include="Addons\ServerQuery\Hooks\ModelCustomizer.cs" />
     <Compile Include="Addons\Test\Hooks\ModelCustomizer.cs" />
     <Compile Include="Addons\Test\Hooks\CoreContext.cs" />
     <Compile Include="Addons\Test\Models\TestUser.cs" />
     <Compile Include="Addons\_Base\AddonBase.cs" />
+    <Compile Include="Addons\_Base\AddonDependencyManager.cs" />
+    <Compile Include="Addons\_Base\IAddonBase.cs" />
     <Compile Include="Addons\_Base\IAddon.cs" />
     <Compile Include="Addons\ServerQuery\ServerQueryAddon.cs" />
     <Compile Include="Addons\Test\TestAddon.cs" />
     <Compile Include="Addons\ServerQuery\Models\ServerQueryUser.cs" />
     <Compile Include="BaseContext.cs" />
+    <Compile Include="Bot\AddonQueryRunner.cs" />
     <Compile Include="CoreContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
     <Compile Include="Bot\ServerQueryBaseConnection.cs" />
@@ -146,6 +154,10 @@
     <Compile Include="Migrations\20160323203450_TestAddon1.cs" />
     <Compile Include="Migrations\20160323203450_TestAddon1.designer.cs">
       <DependentUpon>20160323203450_TestAddon1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160324210722_InputOwner1.cs" />
+    <Compile Include="Migrations\20160324210722_InputOwner1.designer.cs">
+      <DependentUpon>20160324210722_InputOwner1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />

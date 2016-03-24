@@ -26,23 +26,8 @@ namespace Lyralei.Bot
 {
     public class ServerQueryBaseConnection : IDisposable
     {
-        #region Semaphore-enabled Events
-        //public event EventHandler<MessageReceivedEventArgs> Sync_ChannelMessageReceived;
-        //public event EventHandler<ClientBanEventArgs> Sync_ClientBan;
-        //public event EventHandler<ClientConnectionLostEventArgs> Sync_ClientConnectionLost;
-        //public event EventHandler<ClientDisconnectEventArgs> Sync_ClientDisconnect;
-        //public event EventHandler<ClientJoinedEventArgs> Sync_ClientJoined;
-        //public event EventHandler<ClientKickEventArgs> Sync_ClientKick;
-        ////public event EventHandler<MessageReceivedEventArgs> Sync_ClientMessageReceived;
-        //public event EventHandler<ClientMovedEventArgs> Sync_ClientMoved;
-        //public event EventHandler<ClientMovedEventArgs> Sync_ClientMovedByTemporaryChannelCreate;
-        //public event EventHandler<ClientMovedByClientEventArgs> Sync_ClientMoveForced;
-        //public event EventHandler<MessageReceivedEventArgs> Sync_ServerMessageReceived;
-        //public event EventHandler<ChannelCreatedEventArgs> Sync_ChannelCreated; //Custom event
-        #endregion
-
         bool disposing = false;
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger logger = LogManager.GetCurrentClassLogger();
 
         //Serverquery user information
         public WhoAmIResponse whoAmI;
@@ -60,14 +45,13 @@ namespace Lyralei.Bot
         public AsyncTcpDispatcher atd;
         public QueryRunner queryRunner;
         Subscribers subscriber;
-        //AddonManager addonManager;
 
         //Timer-related stuff for connecting to the server
         //public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
         private AutoResetEvent connectionChange;
 
         //Threading-related
-        SemaphoreSlim unknownEventQueue; //Used to keep track of double-events and streamline multi-threading to pseudo single-thread
+        //SemaphoreSlim unknownEventQueue; //Used to keep track of double-events and streamline multi-threading to pseudo single-thread
 
         public void Dispose()
         {
@@ -95,29 +79,15 @@ namespace Lyralei.Bot
                 Initialize();
         }
 
-        //public ServerQueryBaseConnection(Models.Subscribers _subscriber, Lyralei.Addons.ServerQuery.ServerQueryUser _user, bool autoconnect = false)
-        //{
-        //    UpdateSubscriberInfo(_subscriber);
-
-        //    if (autoconnect)
-        //        Initialize();
-        //}
-
         public void UpdateSubscriberInfo(Models.Subscribers _subscriber)
         {
             subscriber = _subscriber;
-
-            //if (_user != null)
-            //{
-            //    _subscriber.AdminUsername = _user.ServerQueryUsername;
-            //    _subscriber.AdminPassword = _user.ServerQueryPassword;
-            //}
         }
 
         public void Initialize()
         {
             this.connectionChange = new AutoResetEvent(false);
-            unknownEventQueue = new SemaphoreSlim(1);
+            //unknownEventQueue = new SemaphoreSlim(1);
             atd = new AsyncTcpDispatcher(subscriber.ServerIp, (ushort)subscriber.ServerPort);
             queryRunner = new QueryRunner(atd);
 
@@ -209,35 +179,8 @@ namespace Lyralei.Bot
         {
             SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
 
-            return login;
-
-            //if (login.IsErroneous == true)
-            //    throw new Exception(login.ErrorMessage);
+            return login; //Does not throw any exceptions
         }
-
-        //void Login(string username, string password)
-        //{
-        //    SimpleResponse login = queryRunner.Login(username, password);
-
-        //    if (login.IsErroneous == true)
-        //        throw new Exception(login.ErrorMessage);
-        //}
-
-        //void Login(Addons.ServerQuery.ServerQueryUser user)
-        //{
-        //    SimpleResponse login = queryRunner.Login(user.ServerQueryUsername, user.ServerQueryPassword);
-
-        //    if (login.IsErroneous == true)
-        //        throw new Exception(login.ErrorMessage);
-        //}
-
-        //void Login(Subscribers subscriber)
-        //{
-        //    SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, EscapeChars(subscriber.AdminPassword));
-
-        //    if (login.IsErroneous == true)
-        //        throw new Exception(login.ErrorMessage);
-        //}
 
         public void Connect()
         {

@@ -21,26 +21,31 @@ using NLog;
 
 namespace Lyralei.Addons.Base
 {
-    //The Addon base class assigns all the variables. This saves some space for creating multiple addon classes.
-    abstract public class AddonBase
+    // The Addon base class assigns all the variables and stuff.
+    abstract public class AddonBase : IAddonBase
     {
-        //public delegate void Sync_ClientMessageReceived(object source, MyEventArgs e);
+        // Addon dependencies
+        public AddonDependencyManager dependencyManager { get; set; }
 
         public ServerQueryRootConnection serverQueryRootConnection;
         public Models.Subscribers subscriber;
+
+        // 'Shortcuts'
         public QueryRunner queryRunner;
         public AsyncTcpDispatcher atd;
-        public SemaphoreSlim QueryQueue;
-        //public BotCommandPrefaceList commandlist;
 
         protected Logger logger;
+
+        
 
         public AddonBase()
         {
             logger = LogManager.GetCurrentClassLogger();
+
+            dependencyManager = new AddonDependencyManager();
         }
 
-        internal void BaseInitialize(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
+        public void Configure(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
         {
             //sql = _sql;
             this.serverQueryRootConnection = serverQueryRootConnection;

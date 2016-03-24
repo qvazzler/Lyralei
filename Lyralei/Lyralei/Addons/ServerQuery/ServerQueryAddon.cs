@@ -16,11 +16,20 @@ namespace Lyralei.Addons.ServerQuery
 {
     class ServerQueryAddon : AddonBase, IAddon
     {
+        public string AddonName { get; set; } = "ServerQuery";
+
+        public Test.TestAddon testAddon = null;
+
         public void Initialize()
         {
             this.serverQueryRootConnection.BotCommandReceived += onBotCommand;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
+
+            //Add a dependency
+            this.dependencyManager.AddDependencyRequirement("Test");
+            this.dependencyManager.UpdateInjections();
+            testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
         }
 
         private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)

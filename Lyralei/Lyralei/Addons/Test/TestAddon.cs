@@ -11,6 +11,8 @@ namespace Lyralei.Addons.Test
 {
     class TestAddon : AddonBase, IAddon
     {
+        public string AddonName { get; set; } = "Test";
+
         public void Initialize()
         {
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
@@ -47,6 +49,11 @@ namespace Lyralei.Addons.Test
             var clientInfo = queryRunner.GetClientInfo(e.ClientId);
 
             logger.Debug("Client changed channel! His name was {0}", clientInfo.Nickname);
+        }
+
+        public void RequestDependencies()
+        {
+            throw new NotImplementedException();
         }
     }
 }
