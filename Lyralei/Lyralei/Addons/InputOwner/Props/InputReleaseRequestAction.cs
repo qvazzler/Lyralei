@@ -6,14 +6,10 @@ using System.Threading.Tasks;
 
 namespace Lyralei.Addons.InputOwner.Props
 {
-    public enum PriorityLevel
+    public enum ReleaseRequestAction
     {
-        Highest = 6,
-        Higher = 5,
-        High = 4,
-        Normal = 3,
-        Low = 2,
-        Lower = 1,
-        Lowest = 0,
+        Refuse = 0,
+        Ask = 1,
+        Allow = 1,
     }
 }

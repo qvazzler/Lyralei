@@ -118,11 +118,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
+    <Compile Include="Addons\InputOwner\Base\IAddonWithInputNotifications.cs" />
     <Compile Include="Addons\InputOwner\Hooks\CoreContext.cs" />
     <Compile Include="Addons\InputOwner\Hooks\ModelCustomizer.cs" />
     <Compile Include="Addons\InputOwner\Models\InputOwners.cs" />
     <Compile Include="Addons\InputOwner\InputOwnerAddon.cs" />
-    <Compile Include="Addons\InputOwner\Props\PriorityLevel.cs" />
+    <Compile Include="Addons\InputOwner\Props\QueuePosition.cs" />
+    <Compile Include="Addons\InputOwner\Props\InputReleaseRequestAction.cs" />
     <Compile Include="Addons\ServerQuery\Hooks\CoreContext.cs" />
     <Compile Include="Addons\ServerQuery\Hooks\ModelCustomizer.cs" />
     <Compile Include="Addons\Test\Hooks\ModelCustomizer.cs" />

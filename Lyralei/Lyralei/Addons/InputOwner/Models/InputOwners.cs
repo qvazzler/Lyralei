@@ -14,8 +14,9 @@ namespace Lyralei.Addons.InputOwner.Models
         public string AddonName;
 
         public DateTime Created;
-        public TimeSpan InputWaitDuration;
-        public Props.PriorityLevel Priority; // 6 = Highest, 0 = Lowest
+        public TimeSpan? InputWaitDuration;
+        public Props.ReleaseRequestAction ReleaseRequestAction;
+        public Props.QueuePosition QueuePosition;
 
         public int UserId { get; set; } // foreign
         public Lyralei.Models.Users Users { get; set; } // dependant
