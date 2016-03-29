@@ -10,13 +10,24 @@ namespace Lyralei.Addons
 {
     public class AddonManager
     {
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger logger;
+        
         public List<IAddon> addons = new List<IAddon>();
-        Models.Subscribers subscriber;
+
+        private Models.Subscribers subscriber;
+        public Models.Subscribers Subscriber
+        {
+            get { return subscriber; }
+            set
+            {
+                subscriber = value;
+                logger = LogManager.GetLogger(this.GetType().Name + " - " + Subscriber.ToString());
+            }
+        }
 
         public AddonManager(Models.Subscribers subscriber, Bot.ServerQueryRootConnection serverQueryRootConnection)
         {
-            this.subscriber = subscriber;
+            this.Subscriber = subscriber;
 
             // Hard-coded for now..
             addons.Add(new InputOwner.InputOwnerAddon());
@@ -24,12 +35,6 @@ namespace Lyralei.Addons
             addons.Add(new ServerQuery.ServerQueryAddon());
 
             List<IAddon> failedAddons = new List<IAddon>();
-
-            // Wire up any injection requests by the addons to addon manager
-            foreach (IAddon addon in addons)
-            {
-                addon.dependencyManager.injectionRequest += AddonDependencyManager_injectionRequest;
-            }
 
             // Configure each addon with the basic stuff
             for (int addonIndex = 0; addonIndex < addons.Count; addonIndex++)
@@ -41,12 +46,18 @@ namespace Lyralei.Addons
                 catch (Exception ex)
                 {
                     logger.Error()
-                        .Message("Addon to load during configuration: {0}", addons[addonIndex].AddonName)
+                        .Message("Addon failed to load during configuration: {0}", addons[addonIndex].AddonName)
                         .Exception(ex)
-                        .Property("subscriber", subscriber.ToString())
+                        .Property("subscriber", Subscriber.ToString())
                         .Write();
                     addons.RemoveAt(addonIndex);
                 }
+            }
+
+            // Wire up any injection requests by the addons to addon manager
+            foreach (IAddon addon in addons)
+            {
+                addon.dependencyManager.injectionRequest += AddonDependencyManager_injectionRequest;
             }
 
             // Initialize each addon
@@ -59,9 +70,27 @@ namespace Lyralei.Addons
                 catch (Exception ex)
                 {
                     logger.Error()
-                        .Message("Addon to load during initialization: {0}", addons[addonIndex].AddonName)
+                        .Message("Addon failed to load during initialization: {0}", addons[addonIndex].AddonName)
                         .Exception(ex)
-                        .Property("subscriber", subscriber.ToString())
+                        .Property("subscriber", Subscriber.ToString())
+                        .Write();
+                    addons.RemoveAt(addonIndex);
+                }
+            }
+
+            // Let addons define their dependencies
+            for (int addonIndex = 0; addonIndex < addons.Count; addonIndex++)
+            {
+                try
+                {
+                    addons[addonIndex].DefineDependencies();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error()
+                        .Message("Addon failed to load during dependency definitions: {0}", addons[addonIndex].AddonName)
+                        .Exception(ex)
+                        .Property("subscriber", Subscriber.ToString())
                         .Write();
                     addons.RemoveAt(addonIndex);
                 }
@@ -76,11 +105,11 @@ namespace Lyralei.Addons
                 }
                 catch (Exception ex)
                 {
-                    //logger.Error(ex, "{0} - Addon to load during dependency initialization: {1}", subscriber.ToString(), addons[addonIndex].AddonName);
+                    //logger.Error(ex, "{0} - Addon failed to load during dependency initialization: {1}", Subscriber.ToString(), addons[addonIndex].AddonName);
                     logger.Error()
-                        .Message("Addon to load during dependency initialization: {0}", addons[addonIndex].AddonName)
+                        .Message("Addon failed to load during dependency initialization: {0}", addons[addonIndex].AddonName)
                         .Exception(ex)
-                        .Property("subscriber", subscriber.ToString())
+                        .Property("subscriber", Subscriber.ToString())
                         .Write();
 
                     addons.RemoveAt(addonIndex);
@@ -103,7 +132,7 @@ namespace Lyralei.Addons
                     logger.Error()
                         .Message("Could not inject Addon because it does not exist or is not loaded: {0}", requestedAddon)
                         .Exception(ex)
-                        .Property("subscriber", subscriber.ToString())
+                        .Property("subscriber", Subscriber.ToString())
                         .Write();
                 }
             }

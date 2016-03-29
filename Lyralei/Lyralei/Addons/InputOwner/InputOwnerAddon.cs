@@ -37,13 +37,18 @@ namespace Lyralei.Addons.InputOwner
             this.serverQueryRootConnection.queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
+
+            logger.Info("I have been initialized yo!");
+        }
+
+        public void DefineDependencies()
+        {
+            this.dependencyManager.AddDependencyRequirement("Test");
         }
 
         public void InitializeDependencies()
         {
             this.dependencyManager.UpdateInjections();
-
-            testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
         }
 
         public void RequestInput(IAddon Addon, Lyralei.Models.Users user, int? inputWaitDuration = null, Props.ReleaseRequestAction releaseRequestAction = Props.ReleaseRequestAction.Ask, Props.QueuePosition queuePosition = Props.QueuePosition.Last)
@@ -175,18 +180,29 @@ namespace Lyralei.Addons.InputOwner
 
         private void Notifications_ClientMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            UserManager userManager = new UserManager(this.subscriber.SubscriberId);
+            UserManager userManager = new UserManager(this.Subscriber.SubscriberId);
 
             using (var db = new CoreContext())
             {
-                var user = userManager.QueryUser(this.subscriber.SubscriberId, this.subscriber.SubscriberUniqueId, e.InvokerUniqueId);
+                var user = userManager.QueryUser(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId, e.InvokerUniqueId);
 
                 var AddonThatOwnsInput = db.InputOwners.SingleOrDefault(x => x.UserId == user.UserId && x.HasOwnership);
 
                 if (AddonThatOwnsInput != null)
+                {
                     onInputReceived.Invoke(this, new EventArguments.InputDetailsEventArgs(AddonThatOwnsInput, e));
+
+                    if (AddonThatOwnsInput.SingleInputAndRelease)
+                    {
+                        // Addon only needed one input, do we release immediately
+                        db.Remove(AddonThatOwnsInput);
+                        db.SaveChanges();
+
+                        // Update queue to let next one get input
+                        UpdateInputQueue();
+                    }
+                }
             }
         }
-
     }
 }

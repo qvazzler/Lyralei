@@ -24,38 +24,42 @@ namespace Lyralei.Addons.Base
     // The Addon base class assigns all the variables and stuff.
     abstract public class AddonBase : IAddonBase
     {
+        protected Logger logger;
+
         // Addon dependencies
         public AddonDependencyManager dependencyManager { get; set; }
 
         public ServerQueryRootConnection serverQueryRootConnection;
-        public Models.Subscribers subscriber;
+
+        private Models.Subscribers subscriber;
+        public Models.Subscribers Subscriber
+        {
+            get { return subscriber; }
+            set
+            {
+                subscriber = value;
+                logger = LogManager.GetLogger(this.GetType().Name + " - " + subscriber.ToString());
+            }
+        }
 
         // 'Shortcuts'
         public QueryRunner queryRunner;
         public AsyncTcpDispatcher atd;
 
-        protected Logger logger;
-
-        
-
         public AddonBase()
         {
-            logger = LogManager.GetCurrentClassLogger();
-
-            dependencyManager = new AddonDependencyManager(this.subscriber);
+            logger = LogManager.GetLogger(this.GetType().Name);
         }
 
         public void Configure(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
         {
-            //sql = _sql;
+            this.Subscriber = subscriber;
+
+            dependencyManager = new AddonDependencyManager(this.Subscriber);
+
             this.serverQueryRootConnection = serverQueryRootConnection;
             queryRunner = serverQueryRootConnection.queryRunner;
             atd = serverQueryRootConnection.atd;
-            this.subscriber = subscriber;
-
-            this.dependencyManager.subscriber = this.subscriber;
-            //QueryQueue = _serverQueryConnection.queryQueue;
-            //commandlist = new BotCommandPrefaceList();
         }
 
         public virtual void onClientMessage(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e/*, BotCommandInput input, BotCommandPreface preface*/)

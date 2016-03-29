@@ -16,14 +16,23 @@ namespace Lyralei.Addons.Base
         public delegate void InjectionRequest(object sender, List<string> RequestedAddons);
         public event InjectionRequest injectionRequest;
 
+        private Logger logger;
+
         public Models.Subscribers subscriber;
+        public Models.Subscribers Subscriber
+        {
+            get { return subscriber; }
+            set
+            {
+                subscriber = value;
+                logger = LogManager.GetLogger(this.GetType().Name + " - " + subscriber.ToString());
+            }
+        }
 
         public AddonDependencyManager(Models.Subscribers subscriber)
         {
-            this.subscriber = subscriber;
+            this.Subscriber = subscriber;
         }
-
-        private Logger logger = LogManager.GetCurrentClassLogger();
 
         public void InjectDependency(IAddon Addon)
         {

@@ -28,7 +28,8 @@ namespace Lyralei.Bot
     public class ServerQueryBaseConnection : IDisposable
     {
         bool disposing = false;
-        private Logger logger = LogManager.GetCurrentClassLogger();
+        //private Logger logger = LogManager.GetCurrentClassLogger();
+        private Logger logger;
 
         //Serverquery user information
         public WhoAmIResponse whoAmI;
@@ -45,7 +46,17 @@ namespace Lyralei.Bot
         //Needed stuff for connection
         public AsyncTcpDispatcher atd;
         public QueryRunner queryRunner;
-        Subscribers subscriber;
+
+        private Subscribers subscriber;
+        public Subscribers Subscriber
+        {
+            get { return subscriber; }
+            set
+            {
+                subscriber = value;
+                logger = LogManager.GetLogger(this.GetType().Name + " - " + subscriber.ToString());
+            }
+        }
 
         //Timer-related stuff for connecting to the server
         //public readonly TimeSpan MaxWait = TimeSpan.FromMilliseconds(5000);
@@ -69,11 +80,13 @@ namespace Lyralei.Bot
 
         public ServerQueryBaseConnection()
         {
-
+            logger = LogManager.GetLogger(this.GetType().Name);
         }
 
         public ServerQueryBaseConnection(Models.Subscribers _subscriber, bool autoconnect = false)
         {
+            logger = LogManager.GetLogger(this.GetType().Name);
+
             UpdateSubscriberInfo(_subscriber);
 
             if (autoconnect)
@@ -82,14 +95,14 @@ namespace Lyralei.Bot
 
         public void UpdateSubscriberInfo(Models.Subscribers _subscriber)
         {
-            subscriber = _subscriber;
+            Subscriber = _subscriber;
         }
 
         public void Initialize()
         {
             this.connectionChange = new AutoResetEvent(false);
             //unknownEventQueue = new SemaphoreSlim(1);
-            atd = new AsyncTcpDispatcher(subscriber.ServerIp, (ushort)subscriber.ServerPort);
+            atd = new AsyncTcpDispatcher(Subscriber.ServerIp, (ushort)Subscriber.ServerPort);
             queryRunner = new QueryRunner(atd);
 
             //atd.ServerClosedConnection += atd_ServerClosedConnection;
@@ -103,12 +116,12 @@ namespace Lyralei.Bot
             if (loginResult.IsBanned)
                 logger.Info()
                     .Message("Login failure due to ban: {0}", loginResult.ResponseText)
-                    .Property("subscriber", subscriber.ToString())
+                    .Property("subscriber", Subscriber.ToString())
                     .Write();
             else if (loginResult.IsErroneous)
                 logger.Info()
                     .Message("Login failure due to error: {0}", loginResult.ResponseText)
-                    .Property("subscriber", subscriber.ToString())
+                    .Property("subscriber", Subscriber.ToString())
                     .Write();
             else
             {
@@ -133,7 +146,7 @@ namespace Lyralei.Bot
             {
                 logger.Warn()
                     .Message("Could not initialize connection")
-                    .Property("subscriber", subscriber.ToString())
+                    .Property("subscriber", Subscriber.ToString())
                     .Write();
             }
         }
@@ -187,7 +200,7 @@ namespace Lyralei.Bot
 
         public SimpleResponse Login()
         {
-            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
+            SimpleResponse login = queryRunner.Login(Subscriber.AdminUsername, Subscriber.AdminPassword);
 
             return login; //Does not throw any exceptions
         }
@@ -212,7 +225,7 @@ namespace Lyralei.Bot
             {
                 logger.Info()
                     .Message("Connected")
-                    .Property("subscriber", subscriber.ToString())
+                    .Property("subscriber", Subscriber.ToString())
                     .Write();
             }
             else

@@ -32,6 +32,10 @@ namespace Lyralei.Addons.InputOwner.Hooks
                  .Property(b => b.HasOwnership)
                  .HasDefaultValue(false);
 
+            modelBuilder.Entity<Models.InputOwners>()
+                 .Property(b => b.SingleInputAndRelease)
+                 .HasDefaultValue(false);
+
             // Make Blog.Url required
             //modelBuilder.Entity<ServerQueryUserDetails>()
             //.HasOne(p => p.Users)

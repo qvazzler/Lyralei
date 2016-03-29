@@ -11,6 +11,7 @@ using TS3QueryLib.Core.Server.Notification.EventArgs;
 
 using Microsoft.Data.Entity;
 using System.Threading;
+using NLog.Fluent;
 
 namespace Lyralei.Addons.ServerQuery
 {
@@ -25,8 +26,10 @@ namespace Lyralei.Addons.ServerQuery
             this.serverQueryRootConnection.BotCommandReceived += onBotCommand;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
+        }
 
-            //Add a dependency
+        public void DefineDependencies()
+        {
             this.dependencyManager.AddDependencyRequirement("Test");
         }
 
@@ -41,7 +44,7 @@ namespace Lyralei.Addons.ServerQuery
         {
             //Command cmd = new Command("help", new string[] { "serverinfo", "additionaltest" });
             Command cmd = new Command(cmdPG);
-            Bot.UserManager userManager = new Bot.UserManager(this.subscriber.SubscriberId);
+            Bot.UserManager userManager = new Bot.UserManager(this.Subscriber.SubscriberId);
 
             //userManager.GetUserInformation
 
@@ -58,7 +61,7 @@ namespace Lyralei.Addons.ServerQuery
                         {
                             using (var db = new CoreContext())
                             {
-                                var user = userManager.QueryUser(subscriber.SubscriberId, subscriber.SubscriberUniqueId, e.InvokerUniqueId);
+                                var user = userManager.QueryUser(Subscriber.SubscriberId, Subscriber.SubscriberUniqueId, e.InvokerUniqueId);
 
                                 Models.ServerQueryUser sqUser = new Models.ServerQueryUser()
                                 {
@@ -73,16 +76,14 @@ namespace Lyralei.Addons.ServerQuery
                                     {
                                     AdminPassword = sqUser.ServerQueryPassword,
                                     AdminUsername = sqUser.ServerQueryUsername,
-                                    ServerIp = subscriber.ServerIp,
-                                    ServerPort = subscriber.ServerPort,
-                                    SubscriberId = subscriber.SubscriberId,
-                                    SubscriberUniqueId = subscriber.SubscriberUniqueId,
-                                    VirtualServerId = subscriber.VirtualServerId,
+                                    ServerIp = Subscriber.ServerIp,
+                                    ServerPort = Subscriber.ServerPort,
+                                    SubscriberId = Subscriber.SubscriberId,
+                                    SubscriberUniqueId = Subscriber.SubscriberUniqueId,
+                                    VirtualServerId = Subscriber.VirtualServerId,
                                 };
 
                                 ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials);
-
-                                //serverQueryUserConnection.Initialize();
 
                                 Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
                                 thread.Start();
@@ -117,37 +118,21 @@ namespace Lyralei.Addons.ServerQuery
                                         }
                                     }
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
-                                    TextReply(e, "Error, please check your command and try again.");
+                                    throw ex;
                                 }
                             }
-
-                            //var username = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "username").Value;
-                            //var password = cmdPG.Single(cmdP => cmdP.Name.ToLower() == "password").Value;
-
-                            //var serverUniqueId = queryRunner.GetServerInfo().UniqueId;
-
-                            //var uniqueId = e.InvokerUniqueId;
-                            //var databaseId = queryRunner.GetClientDatabaseIdsByUniqueId(uniqueId);
                         }
                     }
-
-                    //if(cmdPG.Exists(cmdP =>
-                    //{
-                    //    if (cmdP.Name == "action")
-                    //    {
-                    //        if (cmdP.Value == "register")
-                    //        {
-                    //            return true;
-                    //        }
-                    //    }
-
-                    //    return false;
-                    //}));
                 }
                 catch (Exception ex)
                 {
+                    logger.Debug()
+                        .Message("User sent invalid command: {0}", ex)
+                        .Property("subscriber", Subscriber.ToString())
+                        .Write();
+
                     TextReply(e, "Error, please check your command and try again.");
                 }
             }
@@ -163,7 +148,7 @@ namespace Lyralei.Addons.ServerQuery
                         using (var db = new CoreContext())
                         {
                             //user = userManager.GetUser(e.InvokerUniqueId);
-                            var User = db.Users.Single(usr => usr.UserTeamSpeakClientUniqueId == e.InvokerUniqueId && usr.SubscriberUniqueId == subscriber.SubscriberUniqueId);
+                            var User = db.Users.Single(usr => usr.UserTeamSpeakClientUniqueId == e.InvokerUniqueId && usr.SubscriberUniqueId == Subscriber.SubscriberUniqueId);
                             serverQueryUser = db.ServerQueryUser.Single(sqUser => sqUser.Users.UserId == User.UserId);
                         }
                     }
@@ -196,7 +181,7 @@ namespace Lyralei.Addons.ServerQuery
 
         private string SendServerQueryCommand(Command cmd, Models.ServerQueryUser user)
         {
-            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.subscriber))
+            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.Subscriber))
             {
                 return serverQueryUserConnection.queryRunner.SendCommand(cmd);
             }

@@ -14,42 +14,47 @@ using TS3QueryLib.Core.Server.Entities;
 using System.Threading;
 using System.Reflection;
 
-using Lyralei.Logging;
 using Lyralei.Models;
+using NLog;
 
 namespace Lyralei.Bot
 {
     public class BotConnection
     {
-        Models.Subscribers subscriber;
-        Addons.AddonManager addonManager;
+        private Logger logger;
 
-        public BotConnection()
+        private Subscribers subscriber;
+        public Subscribers Subscriber
         {
-
+            get { return subscriber; }
+            set
+            {
+                subscriber = value;
+                logger = LogManager.GetLogger(this.GetType().Name + " - " + subscriber.ToString());
+            }
         }
+        Addons.AddonManager addonManager;
 
         public BotConnection(Subscribers _subscriber)
         {
-            Load(_subscriber);
+            Subscriber = _subscriber;
+
+            Load();
         }
 
-        public void Load(Subscribers _subscriber)
+        public void Load()
         {
             try
             {
-                //ServerQueryUserConnection serverQueryConnection1 = new ServerQueryUserConnection();
-                //serverQueryConnection1.Initialize(_subscriber);
-
-                subscriber = _subscriber;
                 //Log.Instance.Debug(subscriber.ServerIp + " - Connecting..");
+                logger.Debug("Connecting..");
                 ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber, true);
 
                 addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
             }
             catch (Exception ex)
             {
-                //Log.Instance.Warn(ex, subscriber.ServerIp + " - Failed to connect");
+                logger.Warn(ex, "Failed to connect.");
             }
         }
 

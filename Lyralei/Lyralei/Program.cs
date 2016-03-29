@@ -19,10 +19,11 @@ namespace Lyralei
     //Based on guide: https://docs.efproject.net/en/latest/platforms/full-dotnet/new-db.html
     class Program
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static Logger logger = LogManager.GetLogger(typeof(Program).Name);
 
         static void Main(string[] args)
         {
+
             SynchronizationContext ctx = new SynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(ctx);
 

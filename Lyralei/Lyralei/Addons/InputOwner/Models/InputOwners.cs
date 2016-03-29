@@ -13,6 +13,7 @@ namespace Lyralei.Addons.InputOwner.Models
 
         public string AddonName;
         public bool HasOwnership;
+        public bool SingleInputAndRelease;
 
         public DateTime Created;
         public TimeSpan? InputWaitDuration;
