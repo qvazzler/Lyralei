@@ -18,45 +18,32 @@ namespace Lyralei.Addons.InputOwner
     {
         public string AddonName { get; set; } = "InputOwner";
 
-        public Test.TestAddon testAddon = null;
-        private Models.InputOwners AddonThatOwnsInput;
-
-        public delegate bool AddonOwnershipChanged(object sender, IAddon Addon);
+        public delegate bool AddonOwnershipChanged(object sender, EventArguments.InputOwnerEventArgs e);
         public event AddonOwnershipChanged onAddonOwnershipChanged;
 
-        public delegate bool AddonOwnershipReleaseRequest(object sender, IAddon Addon);
+        public delegate bool AddonOwnershipReleaseRequest(object sender, EventArguments.InputOwnerEventArgs e);
         public event AddonOwnershipReleaseRequest onAddonOwnershipReleaseRequest;
 
-        public delegate bool AddonOwnershipRevoked(object sender, IAddon Addon);
+        public delegate bool AddonOwnershipRevoked(object sender, EventArguments.InputOwnerEventArgs e);
         public event AddonOwnershipRevoked onAddonOwnershipRevoked;
 
-        public delegate bool AddonInputReceived(object sender, IAddon Addon);
+        public delegate bool AddonInputReceived(object sender, EventArguments.InputDetailsEventArgs e);
         public event AddonInputReceived onInputReceived;
+
+        private Test.TestAddon testAddon;
 
         public void Initialize()
         {
-            this.serverQueryRootConnection.BotCommandReceived += onBotCommand;
+            this.serverQueryRootConnection.queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
-
-            //Add a dependency
-            this.dependencyManager.AddDependencyRequirement("Test");
-            this.dependencyManager.UpdateInjections();
-            testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
         }
 
-        private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)
+        public void InitializeDependencies()
         {
-            //Command cmd = new Command("help", new string[] { "serverinfo", "additionaltest" });
-            Command cmd = new Command(cmdPG);
-            Bot.UserManager userManager = new Bot.UserManager(this.subscriber.SubscriberId);
+            this.dependencyManager.UpdateInjections();
 
-            //userManager.GetUserInformation
-
-            if (cmd.Name.ToLower() == "blah")
-            {
-
-            }
+            testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
         }
 
         public void RequestInput(IAddon Addon, Lyralei.Models.Users user, int? inputWaitDuration = null, Props.ReleaseRequestAction releaseRequestAction = Props.ReleaseRequestAction.Ask, Props.QueuePosition queuePosition = Props.QueuePosition.Last)
@@ -79,64 +66,127 @@ namespace Lyralei.Addons.InputOwner
             {
                 db.InputOwners.Add(inputOwner);
             }
+
+            UpdateInputQueue(user.SubscriberId);
+        }
+
+        private List<Models.InputOwners> GetOrderedAddonsInQueue(int? subscriberId, int? clientId, Props.QueuePosition queuePosition)
+        {
+            List<Models.InputOwners> inputOwners = new List<Models.InputOwners>();
+
+            using (var db = new CoreContext())
+            {
+                var owners = db.InputOwners.Where(x => x.QueuePosition == queuePosition && x.HasOwnership == false);
+
+                if (subscriberId != null)
+                    owners = owners.Where(y => y.Users.SubscriberId == subscriberId);
+                if (clientId != null)
+                    owners = owners.Where(y => y.UserId == clientId);
+
+                owners = owners = owners.OrderBy(x => x.Created);
+
+                return owners.ToList();
+            }
         }
 
         private void UpdateInputQueue()
         {
+            UpdateInputQueue(null, null);
+        }
+
+        private void UpdateInputQueue(int? subscriberId)
+        {
+            UpdateInputQueue(subscriberId, null);
+        }
+
+        private void UpdateInputQueue(int? subscriberId, int? clientId)
+        {
             using (var db = new CoreContext())
             {
-                var superImportantBastards = db.InputOwners.Where(inputRequest => inputRequest.QueuePosition == Props.QueuePosition.TryInterruptCurrent).OrderBy(x => x.Created);
-                var kindaImportantBastards = db.InputOwners.Where(inputRequest => inputRequest.QueuePosition == Props.QueuePosition.First).OrderBy(x => x.Created);
-                var hardlyImportantBastards = db.InputOwners.Where(inputRequest => inputRequest.QueuePosition == Props.QueuePosition.Last).OrderBy(x => x.Created);
-                var notImportantBastards = db.InputOwners.Where(inputRequest => inputRequest.QueuePosition == Props.QueuePosition.NotQueueing).OrderBy(x => x.Created);
+                var AddonThatOwnsInput = db.InputOwners.SingleOrDefault(x => x.HasOwnership);
+                Models.InputOwners AddonThatWillOwnInput = null;
 
-                //var doNotDisturb = db.InputOwners.Where(inputRequest => inputRequest.ReleaseRequestAction == Props.ReleaseRequestAction.Refuse);
-                //var knockFirst = db.InputOwners.Where(inputRequest => inputRequest.ReleaseRequestAction == Props.ReleaseRequestAction.Ask);
-                //var alwaysOpen = db.InputOwners.Where(inputRequest => inputRequest.ReleaseRequestAction == Props.ReleaseRequestAction.Allow);
+                var interruptRequests = GetOrderedAddonsInQueue(subscriberId, clientId, Props.QueuePosition.TryInterruptCurrent);
+                var firstRequests = GetOrderedAddonsInQueue(subscriberId, clientId, Props.QueuePosition.First);
+                var lastRequests = GetOrderedAddonsInQueue(subscriberId, clientId, Props.QueuePosition.Last);
+                var noqueueRequests = GetOrderedAddonsInQueue(subscriberId, clientId, Props.QueuePosition.NotQueueing);
+
+                if (interruptRequests.Count() > 0) { AddonThatWillOwnInput = interruptRequests.First(); }
+                else if (firstRequests.Count() > 0) { AddonThatWillOwnInput = firstRequests.First(); }
+                else if (lastRequests.Count() > 0) { AddonThatWillOwnInput = lastRequests.First(); }
+                else if (noqueueRequests.Count() > 0) { AddonThatWillOwnInput = noqueueRequests.First(); }
+                else { /* nobody to give input to, let's */ return; }
 
                 if (AddonThatOwnsInput == null)
                 {
                     //Sure, have the input
-                    if (superImportantBastards.Count() > 0) { AddonThatOwnsInput = superImportantBastards.First(); }
-                    else if (kindaImportantBastards.Count() > 0) { AddonThatOwnsInput = kindaImportantBastards.First(); }
-                    else if (hardlyImportantBastards.Count() > 0) { AddonThatOwnsInput = hardlyImportantBastards.First(); }
-                    else if (notImportantBastards.Count() > 0) { AddonThatOwnsInput = notImportantBastards.First(); }
+                    AddonThatOwnsInput = AddonThatWillOwnInput;
 
-                    if (AddonThatOwnsInput == /*still*/ null)
-                        return;
-                    else
-                        NotifyInputOwnershipGiven(AddonThatOwnsInput);
+                    db.SaveChanges();
 
-                }
-                else if (AddonThatOwnsInput.ReleaseRequestAction == Props.ReleaseRequestAction.Refuse)
-                {
-                    return;
+                    NotifyAddonOwnershipChanged(AddonThatOwnsInput);
                 }
                 else if (AddonThatOwnsInput.ReleaseRequestAction == Props.ReleaseRequestAction.Ask)
+                {
+                    if (NotifyAddonInputReleaseRequest(AddonThatOwnsInput))
+                    {
+                        AddonThatOwnsInput = AddonThatWillOwnInput;
+
+                        db.SaveChanges();
+
+                        NotifyAddonOwnershipChanged(AddonThatOwnsInput);
+                    }
+                }
+                else if (AddonThatOwnsInput.ReleaseRequestAction == Props.ReleaseRequestAction.Allow)
+                {
+                    var AddonThatOwnedInput = AddonThatOwnsInput;
+
+                    AddonThatOwnsInput = AddonThatWillOwnInput;
+
+                    db.SaveChanges();
+
+                    NotifyAddonInputOwnershipRevoked(AddonThatOwnedInput);
+                    NotifyAddonOwnershipChanged(AddonThatOwnsInput);
+                }
+                else
                 {
                     return;
                 }
             }
         }
 
-        private void NotifyInputOwnershipGiven(Models.InputOwners Addon)
+        private void NotifyAddonOwnershipChanged(Models.InputOwners InputOwnerAddon)
         {
-            
+            onAddonOwnershipChanged.Invoke(this, new EventArguments.InputOwnerEventArgs(InputOwnerAddon));
         }
 
-        private void NotifyAddonInputReleaseRequest(Models.InputOwners Addon)
+        private bool NotifyAddonInputReleaseRequest(Models.InputOwners InputOwnerAddon)
         {
-
+            if (onAddonOwnershipReleaseRequest.Invoke(this, new EventArguments.InputOwnerEventArgs(InputOwnerAddon)))
+                return true;
+            else
+                return false;
         }
 
-        private void NotifyAddonInputOwnershipRevoked(Models.InputOwners Addon)
+        private void NotifyAddonInputOwnershipRevoked(Models.InputOwners InputOwnerAddon)
         {
-
+            onAddonOwnershipRevoked.Invoke(this, new EventArguments.InputOwnerEventArgs(InputOwnerAddon));
         }
 
-        private void NotifyInputReceived(Models.InputOwners Addon)
+        private void Notifications_ClientMessageReceived(object sender, MessageReceivedEventArgs e)
         {
+            UserManager userManager = new UserManager(this.subscriber.SubscriberId);
 
+            using (var db = new CoreContext())
+            {
+                var user = userManager.QueryUser(this.subscriber.SubscriberId, this.subscriber.SubscriberUniqueId, e.InvokerUniqueId);
+
+                var AddonThatOwnsInput = db.InputOwners.SingleOrDefault(x => x.UserId == user.UserId && x.HasOwnership);
+
+                if (AddonThatOwnsInput != null)
+                    onInputReceived.Invoke(this, new EventArguments.InputDetailsEventArgs(AddonThatOwnsInput, e));
+            }
         }
+
     }
 }

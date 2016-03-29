@@ -42,14 +42,14 @@ namespace Lyralei.Bot
                 //serverQueryConnection1.Initialize(_subscriber);
 
                 subscriber = _subscriber;
-                Log.Instance.Debug("Connecting to " + subscriber.ServerIp + "..");
+                //Log.Instance.Debug(subscriber.ServerIp + " - Connecting..");
                 ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber, true);
 
                 addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
             }
             catch (Exception ex)
             {
-                Log.Instance.Warn(ex, "Could not connect to " + subscriber.ServerIp + ": " + ex.Message);
+                //Log.Instance.Warn(ex, subscriber.ServerIp + " - Failed to connect");
             }
         }
 

@@ -41,6 +41,11 @@ namespace Lyralei
             dbSet.RemoveRange(dbSet);
         }
 
+        public static void Test<T>() where T : NLog.Logger
+        {
+            
+        }
+
         //Borked?
         //public static T AddIfNotExists<T>(this DbSet<T> dbSet, T entity, Expression<Func<T, bool>> predicate = null) where T : class, new()
         //{

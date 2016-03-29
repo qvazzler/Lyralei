@@ -5,13 +5,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Lyralei.Logging;
+//using Lyralei.Logging;
 using Lyralei.Bot;
 using NLog;
+//using Lyralei.Logging;
 using Microsoft.Data.Entity;
+using NLog.Fluent;
 
 namespace Lyralei
 {
+
+
     //Based on guide: https://docs.efproject.net/en/latest/platforms/full-dotnet/new-db.html
     class Program
     {
@@ -29,7 +33,7 @@ namespace Lyralei
                 if (args.Contains("deletedb"))
                 {
                     db.Database.EnsureDeleted();
-                    
+
                 }
                 else if (args.Contains("resetdb"))
                 {
@@ -50,7 +54,8 @@ namespace Lyralei
 
                 if (db.Subscribers.Count(sub => sub.ServerIp == "localhost") == 0)
                 {
-                    db.Subscribers.Add(new Models.Subscribers {
+                    db.Subscribers.Add(new Models.Subscribers
+                    {
                         ServerIp = "localhost",
                         AdminPassword = "39e7jMad",
                         AdminUsername = "Adam",
@@ -61,14 +66,23 @@ namespace Lyralei
                     });
                     var count = db.SaveChanges();
 
-                    logger.Info("{0} records saved to database", count);
+                    logger.Info()
+                        .Message("{0} records saved to database", count)
+                        .Write();
                 }
 
                 //Console.WriteLine();
                 //Console.WriteLine("All subs in database:");
                 foreach (var subscriber in db.Subscribers)
                 {
-                    logger.Info("Added new connection to server: {0}", subscriber.ServerIp);
+                    //LogEventInfo logEventInfo = new LogEventInfo(LogLevel.Info, "", "blah");
+                    //logEventInfo.Properties["server"] = subscriber.AdminUsername + "@" + subscriber.ServerIp + ":" + subscriber.ServerPort + ":" + subscriber.VirtualServerId;
+
+                    logger.Info()
+                        .Message("Subscriber loaded")
+                        .Property("subscriber", subscriber.ToString())
+                        .Write();
+
                     botConnections.Add(new BotConnection(subscriber));
                 }
             }

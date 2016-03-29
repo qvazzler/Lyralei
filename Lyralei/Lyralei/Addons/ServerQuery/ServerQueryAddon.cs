@@ -28,7 +28,12 @@ namespace Lyralei.Addons.ServerQuery
 
             //Add a dependency
             this.dependencyManager.AddDependencyRequirement("Test");
+        }
+
+        public void InitializeDependencies()
+        {
             this.dependencyManager.UpdateInjections();
+
             testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
         }
 

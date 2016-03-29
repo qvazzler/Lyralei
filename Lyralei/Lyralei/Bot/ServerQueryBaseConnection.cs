@@ -21,6 +21,7 @@ using Lyralei.Addons.Base;
 using Lyralei.Addons;
 using Lyralei.Models;
 using NLog;
+using NLog.Fluent;
 
 namespace Lyralei.Bot
 {
@@ -100,9 +101,15 @@ namespace Lyralei.Bot
             SimpleResponse loginResult = Login();
 
             if (loginResult.IsBanned)
-                logger.Debug("User '{0}' login failure: {1}, {2}", subscriber.AdminUsername, subscriber.ServerIp, loginResult.ResponseText);
+                logger.Info()
+                    .Message("Login failure due to ban: {0}", loginResult.ResponseText)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             else if (loginResult.IsErroneous)
-                logger.Debug("User '{0}' login failure: {1}, {2}", subscriber.AdminUsername, subscriber.ServerIp, loginResult.ResponseText);
+                logger.Info()
+                    .Message("Login failure due to error: {0}", loginResult.ResponseText)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             else
             {
                 SelectServer(subscriber);
@@ -124,7 +131,10 @@ namespace Lyralei.Bot
             }
             catch (Exception ex)
             {
-                logger.Warn("Could not initialize to: {0}", subscriber.ServerIp, ex);
+                logger.Warn()
+                    .Message("Could not initialize connection")
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             }
         }
 
@@ -200,7 +210,10 @@ namespace Lyralei.Bot
             }
             if (atd.Socket.Connected)
             {
-                logger.Info("Connected to server: {0}", subscriber.ServerIp);
+                logger.Info()
+                    .Message("Connected")
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             }
             else
             {

@@ -28,6 +28,10 @@ namespace Lyralei.Addons.InputOwner.Hooks
                  .Property(b => b.InputWaitDuration)
                  .HasDefaultValue(TimeSpan.FromSeconds(120));
 
+            modelBuilder.Entity<Models.InputOwners>()
+                 .Property(b => b.HasOwnership)
+                 .HasDefaultValue(false);
+
             // Make Blog.Url required
             //modelBuilder.Entity<ServerQueryUserDetails>()
             //.HasOne(p => p.Users)

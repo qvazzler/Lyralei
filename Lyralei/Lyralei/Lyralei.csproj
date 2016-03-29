@@ -119,6 +119,8 @@
   <ItemGroup>
     <Compile Include="Addons\AddonManager.cs" />
     <Compile Include="Addons\InputOwner\Base\IAddonWithInputNotifications.cs" />
+    <Compile Include="Addons\InputOwner\EventArguments\InputDetailsEventArgs.cs" />
+    <Compile Include="Addons\InputOwner\EventArguments\InputOwnerEventArgs.cs" />
     <Compile Include="Addons\InputOwner\Hooks\CoreContext.cs" />
     <Compile Include="Addons\InputOwner\Hooks\ModelCustomizer.cs" />
     <Compile Include="Addons\InputOwner\Models\InputOwners.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Bot\ServerQueryUserConnection.cs" />
     <Compile Include="Bot\ServerQueryRootConnection.cs" />
     <Compile Include="Bot\UserManager.cs" />
+    <Compile Include="Logging\BotLogManager.cs" />
     <Compile Include="Migrations\20160323100840_Initial.cs" />
     <Compile Include="Migrations\20160323100840_Initial.designer.cs">
       <DependentUpon>20160323100840_Initial.cs</DependentUpon>

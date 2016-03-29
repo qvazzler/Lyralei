@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NLog;
+using NLog.Fluent;
 
 namespace Lyralei.Addons.Base
 {
@@ -15,24 +16,42 @@ namespace Lyralei.Addons.Base
         public delegate void InjectionRequest(object sender, List<string> RequestedAddons);
         public event InjectionRequest injectionRequest;
 
+        public Models.Subscribers subscriber;
+
+        public AddonDependencyManager(Models.Subscribers subscriber)
+        {
+            this.subscriber = subscriber;
+        }
+
         private Logger logger = LogManager.GetCurrentClassLogger();
 
         public void InjectDependency(IAddon Addon)
         {
             LoadedAddons.Add(Addon);
-            logger.Debug("Addon injected: {0}", Addon.AddonName);
+
+            logger.Debug()
+                .Message("Addon injected: {0}", Addon.AddonName)
+                .Property("subscriber", subscriber.ToString())
+                .Write();
         }
 
         public void AddDependencyRequirement(string AddonName, bool raiseInjectionRequest = false)
         {
             if (RequestedAddons.Exists(AddonInList => AddonInList == AddonName))
             {
-                logger.Debug(String.Format("Dependency requirement {0} already exists, ignoring..", AddonName));
+                logger.Debug()
+                    .Message("Dependency requirement {0} already exists, ignoring..", AddonName)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             }
             else
             {
                 RequestedAddons.Add(AddonName);
-                logger.Debug(String.Format("Dependency requirement added: {0}", AddonName));
+
+                logger.Debug()
+                    .Message("Dependency requirement added: {0}", AddonName)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             }
 
             if (raiseInjectionRequest)
@@ -49,7 +68,11 @@ namespace Lyralei.Addons.Base
                 if (!RequestedAddons.Exists(requestedAddon => requestedAddon == loadedAddon.AddonName))
                 {
                     LoadedAddons.RemoveAll(addon => addon.AddonName == loadedAddon.AddonName);
-                    logger.Debug("Removing injected dependency as it is no longer required: {0}", loadedAddon.AddonName);
+
+                    logger.Debug()
+                        .Message("Removing injected dependency as it is no longer required: {0}", loadedAddon.AddonName)
+                        .Property("subscriber", subscriber.ToString())
+                        .Write();
                 }
             }
 
@@ -63,12 +86,19 @@ namespace Lyralei.Addons.Base
             // Finally raise event and hope someone listens
             if (injectionRequest != null)
             {
-                logger.Debug("Raising injection request for following addons: {0}", String.Join(Environment.NewLine, NeededAddonInjections));
+                logger.Debug()
+                    .Message("Raising injection request for following addons: {0}", String.Join(Environment.NewLine, NeededAddonInjections))
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
+
                 injectionRequest.Invoke(this, NeededAddonInjections);
             }
             else
             {
-                logger.Warn(String.Format("Unmonitored injection request for {0} new dependencies", NeededAddonInjections.Count));
+                logger.Warn()
+                    .Message("Unmonitored injection request for {0} new dependencies", NeededAddonInjections.Count)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
             }
         }
 
@@ -82,18 +112,28 @@ namespace Lyralei.Addons.Base
             try
             {
                 var result = LoadedAddons.Single(addon => addon.AddonName == AddonName);
-                logger.Debug(String.Format("Addon reference returned: {0}", AddonName));
+
+                logger.Debug()
+                    .Message("Addon reference returned: {0}", AddonName)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
 
                 return result;
             }
             catch (InvalidOperationException ex)
             {
-                logger.Warn(String.Format("Addon reference not found: {0}", AddonName));
+                logger.Warn()
+                    .Message("Addon reference not found: {0}", AddonName)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
                 throw ex;
             }
             catch (ArgumentNullException ex)
             {
-                logger.Warn(String.Format("AddonDependencyManager not loaded, failed when requesting Addon: {0}", AddonName));
+                logger.Warn()
+                    .Message("AddonDependencyManager not loaded, failed when requesting Addon: {0}", AddonName)
+                    .Property("subscriber", subscriber.ToString())
+                    .Write();
                 throw ex;
             }
         }

@@ -25,6 +25,23 @@ namespace Lyralei.Models
         public string AdminUsername { get; set; }
         [Required]
         public string AdminPassword { get; set; }
+
+        public override string ToString()
+        {
+            return ToString(true);
+        }
+
+        public string ToString(bool includeUsername)
+        {
+            string result = "";
+
+            if (includeUsername)
+                result += this.AdminUsername + "@";
+
+            result += this.ServerIp + ":" + this.ServerPort + " [ID: " + this.VirtualServerId + "]";
+
+            return result;
+        }
     }
 
 }

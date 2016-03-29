@@ -42,7 +42,7 @@ namespace Lyralei.Addons.Base
         {
             logger = LogManager.GetCurrentClassLogger();
 
-            dependencyManager = new AddonDependencyManager();
+            dependencyManager = new AddonDependencyManager(this.subscriber);
         }
 
         public void Configure(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
@@ -52,6 +52,8 @@ namespace Lyralei.Addons.Base
             queryRunner = serverQueryRootConnection.queryRunner;
             atd = serverQueryRootConnection.atd;
             this.subscriber = subscriber;
+
+            this.dependencyManager.subscriber = this.subscriber;
             //QueryQueue = _serverQueryConnection.queryQueue;
             //commandlist = new BotCommandPrefaceList();
         }

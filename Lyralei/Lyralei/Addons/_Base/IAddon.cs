@@ -6,6 +6,7 @@ namespace Lyralei.Addons.Base
     public interface IAddon : IAddonBase
     {
         void Initialize();
+        void InitializeDependencies();
         string AddonName { get; set; }
     }
 }
