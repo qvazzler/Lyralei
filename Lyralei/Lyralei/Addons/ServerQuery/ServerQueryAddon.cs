@@ -30,14 +30,14 @@ namespace Lyralei.Addons.ServerQuery
 
         public void DefineDependencies()
         {
-            this.dependencyManager.AddDependencyRequirement("Test");
+            this.AddDependencyRequirement("Test");
         }
 
         public void InitializeDependencies()
         {
-            this.dependencyManager.UpdateInjections();
+            this.UpdateInjections();
 
-            testAddon = (Test.TestAddon)dependencyManager.GetAddon("Test");
+            testAddon = (Test.TestAddon)GetDependencyReference("Test");
         }
 
         private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)
@@ -128,10 +128,7 @@ namespace Lyralei.Addons.ServerQuery
                 }
                 catch (Exception ex)
                 {
-                    logger.Debug()
-                        .Message("User sent invalid command: {0}", ex)
-                        .Property("subscriber", Subscriber.ToString())
-                        .Write();
+                    logger.Debug(ex, "User sent invalid command: {0}");
 
                     TextReply(e, "Error, please check your command and try again.");
                 }
@@ -157,7 +154,7 @@ namespace Lyralei.Addons.ServerQuery
                         TextReply(e, "You do not have access to this command.");
                         return;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         TextReply(e, "There was an error performing this command.");
                         return;
@@ -166,24 +163,43 @@ namespace Lyralei.Addons.ServerQuery
                     try
                     {
                         string result = SendServerQueryCommand(cmd, serverQueryUser);
+
+                        //string result = SendServerQueryCommand(cmd, serverQueryUser);
                         this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, result);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         TextReply(e, "There was an error performing this command, or you lacked permissions.");
                         return;
                     }
-                }
 
-                break;
+                    break;
+                }
             }
         }
 
         private string SendServerQueryCommand(Command cmd, Models.ServerQueryUser user)
         {
-            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(this.Subscriber))
+            Lyralei.Models.Subscribers subscriberUserCredentials = new Lyralei.Models.Subscribers()
             {
-                return serverQueryUserConnection.queryRunner.SendCommand(cmd);
+                AdminPassword = user.ServerQueryPassword,
+                AdminUsername = user.ServerQueryUsername,
+                ServerIp = Subscriber.ServerIp,
+                ServerPort = Subscriber.ServerPort,
+                SubscriberId = Subscriber.SubscriberId,
+                SubscriberUniqueId = Subscriber.SubscriberUniqueId,
+                VirtualServerId = Subscriber.VirtualServerId,
+            };
+
+            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials))
+            {
+                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                thread.Start();
+                thread.Join();
+
+                var result = serverQueryUserConnection.queryRunner.SendCommand(cmd);
+
+                return result;
             }
         }
     }

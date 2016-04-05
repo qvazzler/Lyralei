@@ -28,30 +28,10 @@ namespace Lyralei.Bot
         //TODO: Add something to EventArgs to let us decide whether events should keep getting invoked to other addons..
         //      Should probably consider alterating TS3QueryLib with this, adding a simple "Handled" property to all eventargs and put the logic in by ourselves
         //      Actually, maybe it's better to keep this with the bot.. Not everyone would want to follow this implementation
-        public delegate void BotCommandReceive(object sender, CommandParameterGroup cmd, MessageReceivedEventArgs e);
-        public event BotCommandReceive BotCommandReceived;
 
         public ServerQueryRootConnection(Models.Subscribers _subscriber, bool autoconnect = false) : base(_subscriber, autoconnect)
         {
-            //RegisterEvents();
-            this.queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
-        }
 
-        private void Notifications_ClientMessageReceived(object sender, MessageReceivedEventArgs e)
-        {
-            //addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
-            if (e.InvokerClientId != whoAmI.ClientId)
-            {
-                if (e.Message.StartsWith("!"))
-                {
-                    string cmd = e.Message.Remove(0, 1);
-
-                    var cmdPGL = CommandParameterGroupList.Parse(cmd);
-
-                    foreach (CommandParameterGroup cmdPG in cmdPGL)
-                        BotCommandReceived.Invoke(this, cmdPG, e);
-                }
-            }
         }
     }
 }

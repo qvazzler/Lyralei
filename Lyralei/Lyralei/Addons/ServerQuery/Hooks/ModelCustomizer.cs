@@ -18,6 +18,10 @@ namespace Lyralei.Addons.ServerQuery.Hooks
             //.HasOne(p => p.Users)
             //.WithOne()
             //.HasForeignKey<ServerQueryUserDetails>(b => b.ServerQueryUserDetailsForeignKey);
+
+            modelBuilder.Entity<Models.ServerQueryUser>()
+                .HasAlternateKey(c => c.UserId)
+                .HasName("AK_UserId");
         }
     }
 }

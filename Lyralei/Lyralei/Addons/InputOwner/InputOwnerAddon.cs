@@ -43,12 +43,12 @@ namespace Lyralei.Addons.InputOwner
 
         public void DefineDependencies()
         {
-            this.dependencyManager.AddDependencyRequirement("Test");
+            this.AddDependencyRequirement("Test");
         }
 
         public void InitializeDependencies()
         {
-            this.dependencyManager.UpdateInjections();
+            this.UpdateInjections();
         }
 
         public void RequestInput(IAddon Addon, Lyralei.Models.Users user, int? inputWaitDuration = null, Props.ReleaseRequestAction releaseRequestAction = Props.ReleaseRequestAction.Ask, Props.QueuePosition queuePosition = Props.QueuePosition.Last)

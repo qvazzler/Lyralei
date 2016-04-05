@@ -22,10 +22,7 @@ namespace Lyralei.Addons.Test
             this.serverQueryRootConnection.BotCommandReceived += ServerQueryRootConnection_BotCommandReceived;
             this.serverQueryRootConnection.queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
 
-            logger.Debug()
-                .Message("TestAddon initialized!")
-                .Property("subscriber", Subscriber.ToString())
-                .Write();
+            logger.Debug("TestAddon initialized!");
         }
 
         public void DefineDependencies()
@@ -40,10 +37,7 @@ namespace Lyralei.Addons.Test
 
         private void ServerQueryRootConnection_BotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            logger.Debug()
-                .Message("Command objects are tricky business! This command was: {0}", cmd[0].Name)
-                .Property("subscriber", Subscriber.ToString())
-                .Write();
+            logger.Debug("Command objects are tricky business! This command was: {0}", cmd[0].Name);
 
             if (cmd[0].Name.ToLower() == "test")
             {
@@ -65,10 +59,7 @@ namespace Lyralei.Addons.Test
         {
             var clientInfo = queryRunner.GetClientInfo(e.ClientId);
 
-            logger.Debug()
-                .Message("Client changed channel! His name was {0}", clientInfo.Nickname)
-                .Property("subscriber", Subscriber.ToString())
-                .Write();
+            logger.Debug("Client changed channel! His name was {0}", clientInfo.Nickname);
         }
     }
 }

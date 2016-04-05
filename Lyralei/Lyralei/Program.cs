@@ -11,6 +11,7 @@ using NLog;
 //using Lyralei.Logging;
 using Microsoft.Data.Entity;
 using NLog.Fluent;
+using TS3QueryLib.Core.CommandHandling;
 
 namespace Lyralei
 {
@@ -23,6 +24,9 @@ namespace Lyralei
 
         static void Main(string[] args)
         {
+            // directconnect host = localhost user = Adam pass = 39e7jMad port = 10011 virtualserverid = 1
+            CommandParameterGroupList cmds;
+            cmds = CommandParameterGroupList.Parse(String.Join(" ", args));
 
             SynchronizationContext ctx = new SynchronizationContext();
             SynchronizationContext.SetSynchronizationContext(ctx);
@@ -31,59 +35,61 @@ namespace Lyralei
 
             using (var db = new CoreContext())
             {
-                if (args.Contains("deletedb"))
+                //Database deletion switch
+                var cmds_deldb = cmds.Where(cmdPG => cmdPG.Exists(cmdP => cmdP.Name == "deletedb"));
+                if (cmds_deldb.Count() > 0)
                 {
                     db.Database.EnsureDeleted();
-
-                }
-                else if (args.Contains("resetdb"))
-                {
-                    db.Subscribers.Clear();
-                    db.SaveChanges();
+                    logger.Info("Database deleted!");
                 }
             }
 
             using (var db = new CoreContext())
             {
-                /*
-                    qvazzler
-                    cWSwCRal
-
-                    Adam
-                    vm1wzFqU
-                */
-
-                if (db.Subscribers.Count(sub => sub.ServerIp == "localhost") == 0)
+                //Subscribers reset switch
+                var cmds_rs = cmds.Where(cmdPG => cmdPG.Exists(cmdP => cmdP.Name == "resetsubscribers"));
+                if (cmds_rs.Count() > 0)
                 {
-                    db.Subscribers.Add(new Models.Subscribers
-                    {
-                        ServerIp = "localhost",
-                        AdminPassword = "39e7jMad",
-                        AdminUsername = "Adam",
-                        //AdminPassword = "password",
-                        //AdminUsername = "serveradmin",
-                        ServerPort = 10011,
-                        VirtualServerId = 1,
-                    });
-                    var count = db.SaveChanges();
-
-                    logger.Info()
-                        .Message("{0} records saved to database", count)
-                        .Write();
+                    db.Subscribers.Clear();
+                    db.SaveChanges();
+                    logger.Info("Subscribers removed!");
                 }
 
-                //Console.WriteLine();
-                //Console.WriteLine("All subs in database:");
+                //Subscriber-adding
+                var cmds_dc = cmds.Where(cmdPG => cmdPG.Exists(cmdP => cmdP.Name == "subscriber"));
+                foreach (var cmd in cmds_dc)
+                {
+                    try
+                    {
+                        var serverIp = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverip").Value;
+                        var adminPassword = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminpassword").Value;
+                        var adminUsername = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminusername").Value;
+                        var serverPort = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverport").Value;
+                        var virtualServerId = cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value;
+                        //bool save = cmd.SingleOrDefault(x => x.Name.ToLower() == "save").Value != "0";
+
+                        Models.Subscribers sub = new Models.Subscribers()
+                        {
+                            ServerIp = serverIp,
+                            AdminPassword = adminPassword,
+                            AdminUsername = adminUsername,
+                            ServerPort = Convert.ToInt16(serverPort),
+                            VirtualServerId = Convert.ToInt32(virtualServerId),
+                        };
+
+                        db.Subscribers.Add(sub);
+                        var count = db.SaveChanges();
+                        logger.Info("Subscriber {0} saved to database", sub.ToString(true));
+                    }
+                    catch (Exception)
+                    {
+                        logger.Warn("Failed to add a subscriber from command line");
+                    }
+                }
+
                 foreach (var subscriber in db.Subscribers)
                 {
-                    //LogEventInfo logEventInfo = new LogEventInfo(LogLevel.Info, "", "blah");
-                    //logEventInfo.Properties["server"] = subscriber.AdminUsername + "@" + subscriber.ServerIp + ":" + subscriber.ServerPort + ":" + subscriber.VirtualServerId;
-
-                    logger.Info()
-                        .Message("Subscriber loaded")
-                        .Property("subscriber", subscriber.ToString())
-                        .Write();
-
+                    logger.Info("Setting up subscriber {0}..", subscriber.ToString(true));
                     botConnections.Add(new BotConnection(subscriber));
                 }
             }

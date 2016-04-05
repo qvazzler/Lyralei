@@ -27,7 +27,7 @@ namespace Lyralei.Addons.Base
         protected Logger logger;
 
         // Addon dependencies
-        public AddonDependencyManager dependencyManager { get; set; }
+        //public AddonDependencyManager dependencyManager { get; set; }
 
         public ServerQueryRootConnection serverQueryRootConnection;
 
@@ -55,7 +55,7 @@ namespace Lyralei.Addons.Base
         {
             this.Subscriber = subscriber;
 
-            dependencyManager = new AddonDependencyManager(this.Subscriber);
+            //dependencyManager = new AddonDependencyManager(this.Subscriber);
 
             this.serverQueryRootConnection = serverQueryRootConnection;
             queryRunner = serverQueryRootConnection.queryRunner;
@@ -76,6 +76,99 @@ namespace Lyralei.Addons.Base
         //{
 
         //}
+
+        #region Dependency Management
+
+        private List<IAddon> LoadedAddons = new List<IAddon>();
+        private List<string> RequestedAddons = new List<string>();
+
+        //public delegate void InjectionRequest(object sender, List<string> RequestedAddons);
+        public event EventHandler<List<string>> InjectionRequest;
+        //public event EventHandler InjectionRequest2;
+
+        public void InjectDependency(IAddon Addon)
+        {
+            LoadedAddons.Add(Addon);
+
+            //logger.Debug("Addon injected: {0}", Addon.AddonName);
+        }
+
+        public void AddDependencyRequirement(string AddonName, bool raiseInjectionRequest = false)
+        {
+            if (RequestedAddons.Exists(AddonInList => AddonInList == AddonName))
+            {
+                //logger.Debug("Dependency requirement {0} by {1} already exists, ignoring..", AddonName);
+            }
+            else
+            {
+                RequestedAddons.Add(AddonName);
+            }
+
+            if (raiseInjectionRequest)
+                UpdateInjections();
+        }
+
+        public void UpdateInjections()
+        {
+            List<string> NeededAddonInjections = new List<string>();
+
+            // First remove any unwanted injections
+            foreach (IAddon loadedAddon in LoadedAddons)
+            {
+                if (!RequestedAddons.Exists(requestedAddon => requestedAddon == loadedAddon.AddonName))
+                {
+                    LoadedAddons.RemoveAll(addon => addon.AddonName == loadedAddon.AddonName);
+
+                    logger.Debug("Removing injected dependency as it is no longer required: {0}", loadedAddon.AddonName);
+                }
+            }
+
+            // Then add needed injections
+            foreach (string requestedAddon in RequestedAddons)
+            {
+                if (!LoadedAddons.Exists(loadedAddon => loadedAddon.AddonName == requestedAddon))
+                    NeededAddonInjections.Add(requestedAddon);
+            }
+
+            // Finally raise event and hope someone listens
+            if (InjectionRequest != null)
+            {
+                //logger.Debug("Raising injection request for following addons: {0}", String.Join(Environment.NewLine, NeededAddonInjections));
+
+                InjectionRequest.Invoke(this, NeededAddonInjections);
+            }
+            else
+            {
+                logger.Warn("Unmonitored injection request for {0} new dependencies", NeededAddonInjections.Count);
+            }
+        }
+
+        public List<string> GetRequestedDependencies()
+        {
+            return RequestedAddons;
+        }
+
+        public IAddon GetDependencyReference(string AddonName)
+        {
+            try
+            {
+                var result = LoadedAddons.Single(addon => addon.AddonName == AddonName);
+
+                return result;
+            }
+            catch (InvalidOperationException ex)
+            {
+                logger.Warn("Addon reference not found: {0}", AddonName);
+                throw ex;
+            }
+            catch (ArgumentNullException ex)
+            {
+                logger.Warn("AddonDependencyManager not loaded, failed when requesting Addon: {0}", AddonName);
+                throw ex;
+            }
+        }
+
+        #endregion
 
         public virtual void onServerMessage(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {

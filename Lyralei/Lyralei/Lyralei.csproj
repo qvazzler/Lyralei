@@ -133,7 +133,6 @@
     <Compile Include="Addons\Test\Hooks\CoreContext.cs" />
     <Compile Include="Addons\Test\Models\TestUser.cs" />
     <Compile Include="Addons\_Base\AddonBase.cs" />
-    <Compile Include="Addons\_Base\AddonDependencyManager.cs" />
     <Compile Include="Addons\_Base\IAddonBase.cs" />
     <Compile Include="Addons\_Base\IAddon.cs" />
     <Compile Include="Addons\ServerQuery\ServerQueryAddon.cs" />
@@ -162,6 +161,10 @@
     <Compile Include="Migrations\20160324210722_InputOwner1.cs" />
     <Compile Include="Migrations\20160324210722_InputOwner1.designer.cs">
       <DependentUpon>20160324210722_InputOwner1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160404095044_ServerQuery2016.04.04.cs" />
+    <Compile Include="Migrations\20160404095044_ServerQuery2016.04.04.designer.cs">
+      <DependentUpon>20160404095044_ServerQuery2016.04.04.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />

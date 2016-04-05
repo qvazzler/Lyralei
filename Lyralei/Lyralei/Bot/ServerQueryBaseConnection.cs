@@ -33,6 +33,7 @@ namespace Lyralei.Bot
 
         //Serverquery user information
         public WhoAmIResponse whoAmI;
+        private string Name;
 
         //Command stuff
         public string commandPrefix;
@@ -41,6 +42,9 @@ namespace Lyralei.Bot
         public delegate void StatusUpdateHandler(object sender, EventArgs e);
         public event StatusUpdateHandler ConnectionDown;
         public event StatusUpdateHandler ConnectionUp;
+
+        public delegate void BotCommandReceive(object sender, CommandParameterGroup cmd, MessageReceivedEventArgs e);
+        public event BotCommandReceive BotCommandReceived;
 
 
         //Needed stuff for connection
@@ -100,6 +104,9 @@ namespace Lyralei.Bot
 
         public void Initialize()
         {
+            if (Name == null)
+                Name = subscriber.AdminUsername;
+
             this.connectionChange = new AutoResetEvent(false);
             //unknownEventQueue = new SemaphoreSlim(1);
             atd = new AsyncTcpDispatcher(Subscriber.ServerIp, (ushort)Subscriber.ServerPort);
@@ -114,22 +121,19 @@ namespace Lyralei.Bot
             SimpleResponse loginResult = Login();
 
             if (loginResult.IsBanned)
-                logger.Info()
-                    .Message("Login failure due to ban: {0}", loginResult.ResponseText)
-                    .Property("subscriber", Subscriber.ToString())
-                    .Write();
+                logger.Info("Login failure due to ban: {0}", loginResult.ResponseText);
             else if (loginResult.IsErroneous)
-                logger.Info()
-                    .Message("Login failure due to error: {0}", loginResult.ResponseText)
-                    .Property("subscriber", Subscriber.ToString())
-                    .Write();
+                logger.Info("Login failure due to error: {0}", loginResult.ResponseText);
             else
             {
+                SendSetNameCmd();
+
                 SelectServer(subscriber);
+
+                SendSetNameCmd();
 
                 UpdateServerUniqueId();
 
-                SetName("Lyralei");
                 whoAmI = queryRunner.SendWhoAmI();
 
                 RegisterEvents();
@@ -144,10 +148,7 @@ namespace Lyralei.Bot
             }
             catch (Exception ex)
             {
-                logger.Warn()
-                    .Message("Could not initialize connection")
-                    .Property("subscriber", Subscriber.ToString())
-                    .Write();
+                logger.Warn(ex, "Could not initialize connection");
             }
         }
 
@@ -168,11 +169,11 @@ namespace Lyralei.Bot
             }
         }
 
-        void SetName(string nickname)
+        private void SendSetNameCmd()
         {
             string result = "";
             int attempts = 1;
-            string modnickname = nickname;
+            string modnickname = Name;
 
             do
             {
@@ -181,13 +182,28 @@ namespace Lyralei.Bot
 
                 result = queryRunner.SendCommand(cmd);
                 attempts += 1;
-                modnickname = nickname + attempts;
+                modnickname = Name + attempts;
 
                 if (attempts > 100)
                     throw new Exception(result);
 
             }
             while (result.StartsWith("error id=513")); //Name taken
+        }
+
+        public void SetName(string nickname)
+        {
+            Name = nickname;
+
+            try
+            {
+                if (atd.IsConnected)
+                    SendSetNameCmd();
+            }
+            catch (Exception)
+            {
+                //Suppress
+            }
         }
 
         void SelectServer(Subscribers subscriber)
@@ -223,10 +239,7 @@ namespace Lyralei.Bot
             }
             if (atd.Socket.Connected)
             {
-                logger.Info()
-                    .Message("Connected")
-                    .Property("subscriber", Subscriber.ToString())
-                    .Write();
+                logger.Info("Connected");
             }
             else
             {
@@ -396,14 +409,19 @@ namespace Lyralei.Bot
         //Client message
         private void Notifications_ClientMessageReceived(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            ////addonManager.addons.ForEach(f => f.onClientMessage(sender, e));
-            //if (e.Message.StartsWith("!"))
-            //{
-            //    string cmd = e.Message.Remove(0, 1);
+            //Bot Commands
+            if (e.InvokerClientId != whoAmI.ClientId)
+            {
+                if (e.Message.StartsWith("!"))
+                {
+                    string cmd = e.Message.Remove(0, 1);
 
-            //    var cmdP = CommandParameterGroupList.Parse(cmd);
-            //    BotCommandReceived.Invoke(this, cmdP);
-            //}
+                    var cmdPGL = CommandParameterGroupList.Parse(cmd);
+
+                    foreach (CommandParameterGroup cmdPG in cmdPGL)
+                        BotCommandReceived.Invoke(this, cmdPG, e);
+                }
+            }
         }
 
         //Client disconnected from server
