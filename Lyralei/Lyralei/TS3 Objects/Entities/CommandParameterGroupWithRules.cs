@@ -9,8 +9,6 @@ namespace Lyralei.TS3_Objects.Entities
 {
     public class CommandParameterGroupWithRules : CommandParameterGroup
     {
-        //public string AddonName;
-
         public CommandParameterGroupWithRules(CommandParameterGroupWithRules cmdPGE) : base()
         {
             this.AddRange(cmdPGE);
@@ -18,69 +16,74 @@ namespace Lyralei.TS3_Objects.Entities
 
         public CommandParameterGroupWithRules() : base()
         {
-            //this.AddonName = AddonName;
+
+        }
+
+        public CommandParameterWithRules this[string index]
+        {
+            get
+            {
+                return (CommandParameterWithRules)this.SingleOrDefault(x => x.Name == index);
+            }
+            protected set
+            {
+                // NOPE
+            }
         }
 
         public void ValidateAddData(CommandParameterGroup cmdPG)
         {
-            var cmdPGFrames = this;
-
             int recognizedParamsCount = 0;
 
             try
             {
-                var cmdPGWithoutValues = cmdPG.Where(cmdP => cmdP.Value == null);
-
                 // First try to patch up the params with value missing, implying name to be used as value
-                for (int i = 0; i < cmdPGWithoutValues.Count(); i++)
+                for (int i = 0; i < this.Count && i < cmdPG.Count(); i++)
                 {
-                    var frame = (CommandParameterWithRules)cmdPGFrames[i];
+                    var frame = (CommandParameterWithRules)this[i];
                     var content = cmdPG[i];
 
-                    if (frame.IsBaseCommand != true)
+                    if (cmdPG[i].Value == null)
                     {
-                        // See if value fits the parameter, else throw excetion on the whole operation
-                        content.Value = frame.Name;
-                        frame.ValidateSetData(content);
-                        recognizedParamsCount++;
+                        if (frame.IsBaseCommand != true)
+                        {
+                            if (frame.NameValueSetting != NameValueSetting.NameOnly)
+                                content.Value = content.Name;
+
+                            // See if value fits the parameter, else throw exception
+                            frame.ValidateSetData(content);
+                            recognizedParamsCount++;
+
+                            if (frame.NameValueSetting != NameValueSetting.NameOnly)
+                                content.Value = null;
+                        }
                     }
                 }
 
                 // Then iterate the known parameter name and value pairs
                 foreach (var content in cmdPG.Where(cmdP => cmdP.Value != null))
                 {
-                    var test = (CommandParameterWithRules)cmdPGFrames.SingleOrDefault(frame => frame.Name == content.Name);
-                    test.ValidateSetData(content);
+                    var matchingCmd = (CommandParameterWithRules)this.SingleOrDefault(frame => frame.Name == content.Name);
+                    matchingCmd.ValidateSetData(content);
                     recognizedParamsCount++;
                 }
 
-                if (recognizedParamsCount != cmdPG.Count-1)
+                foreach (CommandParameterWithRules cmdP in this)
+                    if(cmdP.Required && cmdP.Value == null)
+                        throw new Exception(String.Format("Required parameter '{0}' not defined", cmdP.Name));
+
+                if (recognizedParamsCount != cmdPG.Count - 1)
                     throw new Exception("Unrecognized params");
 
-                // Parameter data is a correct fit. Let's put them to use.
-                //for (int i = 0; i < this.Count; i++)
-                //{
-                //    //var yes = (CommandParameterExpectations)this[i];
-                //    //yes.ValidateSetData(
-                //    this[i] = cmdPGFrames[i];
-                //}
+                if (this.Distinct().Count() != this.Count)
+                    throw new Exception("Duplicate parameter names");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                //Reset data
+                this.ForEach(x => x.Value = null);
+                throw new Exception("Value validation failed. See inner exception for details.", ex);
             }
-
-            //if (frames.SingleOrDefault(frame => frame.Name == ))
-            //{
-
-            //}
-
-            //CommandParameterExpectations frame = (CommandParameterExpectations)frames[frameIndex];
-
-
-            //if (cmdPG[i].Value == null && frame.NameValueSetting == NameValueSetting.NameAndValue)
-            //    throw new Exception("Parameter must contain both name and value");
-
         }
     }
 }

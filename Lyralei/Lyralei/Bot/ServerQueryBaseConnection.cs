@@ -76,8 +76,8 @@ namespace Lyralei.Bot
 
             disposing = true;
 
-            queryRunner.Logout();
-            atd.Disconnect();
+            Logout();
+            Disconnect();
             queryRunner.Dispose();
             atd.Dispose();
         }
@@ -209,6 +209,7 @@ namespace Lyralei.Bot
         void SelectServer(Subscribers subscriber)
         {
             SimpleResponse selectserver = queryRunner.SelectVirtualServerById((uint)subscriber.VirtualServerId);
+            logger.Debug("Virtual server selection result: {0}", selectserver.StatusText);
 
             if (selectserver.IsErroneous)
                 throw new Exception(selectserver.ErrorMessage);
@@ -216,9 +217,29 @@ namespace Lyralei.Bot
 
         public SimpleResponse Login()
         {
-            SimpleResponse login = queryRunner.Login(Subscriber.AdminUsername, Subscriber.AdminPassword);
-
+            SimpleResponse login = queryRunner.Login(subscriber.AdminUsername, subscriber.AdminPassword);
+            logger.Debug("Login result: {0}", login.StatusText);
             return login; //Does not throw any exceptions
+        }
+
+        public SimpleResponse Logout()
+        {
+            SimpleResponse logout = queryRunner.Logout();
+            logger.Debug("Logout result: {0}", logout.StatusText);
+            return logout; //Does not throw any exceptions
+        }
+
+        public void Disconnect()
+        {
+            try
+            {
+                atd.Disconnect();
+                logger.Debug("Disconnected");
+            }
+            catch (Exception ex)
+            {
+                logger.Debug(ex, "Could not disconnect");
+            }
         }
 
         public void Connect()
@@ -239,7 +260,7 @@ namespace Lyralei.Bot
             }
             if (atd.Socket.Connected)
             {
-                logger.Info("Connected");
+                logger.Debug("Connected");
             }
             else
             {

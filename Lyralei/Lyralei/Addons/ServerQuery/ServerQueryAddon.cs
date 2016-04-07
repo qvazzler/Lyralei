@@ -79,7 +79,68 @@ namespace Lyralei.Addons.ServerQuery
 
         public void ServerQueryUserRegistrationCommand(BotCommandEventArgs e)
         {
+            //Command cmd = new Command();
+            Bot.UserManager userManager = new Bot.UserManager(this.Subscriber.SubscriberId);
 
+            using (var db = new CoreContext())
+            {
+                var user = userManager.QueryUser(Subscriber.SubscriberId, Subscriber.SubscriberUniqueId, e.MessageInfo.InvokerUniqueId);
+
+                Models.ServerQueryUser sqUser = new Models.ServerQueryUser()
+                {
+                    UserId = user.UserId,
+                    Users = user,
+                    //SubscriberId = user.SubscriberId,
+                    ServerQueryUsername = e.CommandInfo["username"].Value,
+                    ServerQueryPassword = e.CommandInfo["password"].Value,
+                };
+
+                Lyralei.Models.Subscribers subscriberUserCredentials = new Lyralei.Models.Subscribers()
+                {
+                    AdminPassword = sqUser.ServerQueryPassword,
+                    AdminUsername = sqUser.ServerQueryUsername,
+                    ServerIp = Subscriber.ServerIp,
+                    ServerPort = Subscriber.ServerPort,
+                    SubscriberId = Subscriber.SubscriberId,
+                    SubscriberUniqueId = Subscriber.SubscriberUniqueId,
+                    VirtualServerId = Subscriber.VirtualServerId,
+                };
+
+                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials);
+
+                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                thread.Start();
+                thread.Join();
+
+                try
+                {
+                    if (serverQueryUserConnection.atd.IsConnected)
+                    {
+                        var test = serverQueryUserConnection.whoAmI;
+
+                        if (test == null)
+                            throw new Exception("Login failure");
+                        if (test.IsErroneous)
+                            throw new Exception(test.ResponseText);
+                        else
+                        {
+                            db.ServerQueryUser.Add(sqUser);
+                            db.SaveChanges();
+
+                            serverQueryUserConnection.Logout();
+                            serverQueryUserConnection.Disconnect();
+
+                            //User successfully registered
+                            TextReply(e.MessageInfo, "Successfully registered! You can now execute serverquery commands directly to me based on your user permissions.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Debug(ex, "User failed to register");
+                    TextReply(e.MessageInfo, "Whoops! Did you put in the right details?");
+                }
+            }
         }
 
         private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)

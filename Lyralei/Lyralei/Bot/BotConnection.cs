@@ -71,7 +71,7 @@ namespace Lyralei.Bot
 
         private void AddonManager_onBotCommand(object sender, TS3_Objects.EventArguments.BotCommandEventArgs e)
         {
-            logger.Debug("User {0} (ts3id: {1}) sent command: {2}", e.MessageDetails.InvokerNickname, e.MessageDetails.InvokerClientId, e.MessageDetails.Message);
+            logger.Debug("User {0} (ts3id: {1}) sent command: {2}", e.MessageInfo.InvokerNickname, e.MessageInfo.InvokerClientId, e.MessageInfo.Message);
         }
 
         void serverquery_ConnectionUp(object sender, EventArgs e)

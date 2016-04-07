@@ -66,7 +66,7 @@ namespace Lyralei.Addons.Test
 
         private void ServerQueryRootConnection_BotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
-            logger.Debug("Command objects are tricky business! This command was: {0}", cmd[0].Name);
+            logger.Info("Command objects are tricky business! This command was: {0}", cmd[0].Name);
 
             if (cmd[0].Name.ToLower() == "test")
             {

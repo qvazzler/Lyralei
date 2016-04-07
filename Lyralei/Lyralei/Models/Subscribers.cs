@@ -31,14 +31,14 @@ namespace Lyralei.Models
             return ToString(true);
         }
 
-        public string ToString(bool includeUsername)
+        public string ToString(bool includeUsername = true)
         {
             string result = "";
 
             if (includeUsername)
                 result += this.AdminUsername + "@";
 
-            result += this.ServerIp + ":" + this.ServerPort + " [ID: " + this.VirtualServerId + "]";
+            result += this.ServerIp + ":" + this.ServerPort + ":" + this.VirtualServerId;
 
             return result;
         }

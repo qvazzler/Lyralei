@@ -10,12 +10,12 @@ namespace Lyralei.TS3_Objects.EventArguments
 {
     public class BotCommandEventArgs : EventArgs
     {
-        public CommandParameterGroupWithRules CommandDetails;
-        public MessageReceivedEventArgs MessageDetails;
+        public CommandParameterGroupWithRules CommandInfo;
+        public MessageReceivedEventArgs MessageInfo;
         public BotCommandEventArgs(CommandParameterGroupWithRules command, MessageReceivedEventArgs message)
         {
-            this.CommandDetails = command;
-            this.MessageDetails = message;
+            this.CommandInfo = command;
+            this.MessageInfo = message;
         }
     }
 }
