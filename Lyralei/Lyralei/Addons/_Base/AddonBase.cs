@@ -29,7 +29,7 @@ namespace Lyralei.Addons.Base
         // Addon dependencies
         //public AddonDependencyManager dependencyManager { get; set; }
 
-        public ServerQueryRootConnection serverQueryRootConnection;
+        public ServerQueryConnection ServerQueryConnection;
 
         private Models.Subscribers subscriber;
         public Models.Subscribers Subscriber
@@ -51,15 +51,15 @@ namespace Lyralei.Addons.Base
             logger = LogManager.GetLogger(this.GetType().Name);
         }
 
-        public void Configure(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection)
+        public void Configure(Models.Subscribers subscriber, ServerQueryConnection ServerQueryConnection)
         {
             this.Subscriber = subscriber;
 
             //dependencyManager = new AddonDependencyManager(this.Subscriber);
 
-            this.serverQueryRootConnection = serverQueryRootConnection;
-            queryRunner = serverQueryRootConnection.queryRunner;
-            atd = serverQueryRootConnection.atd;
+            this.ServerQueryConnection = ServerQueryConnection;
+            queryRunner = ServerQueryConnection.queryRunner;
+            atd = ServerQueryConnection.atd;
         }
 
         public virtual void onClientMessage(object sender, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e/*, BotCommandInput input, BotCommandPreface preface*/)

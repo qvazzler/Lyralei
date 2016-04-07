@@ -25,7 +25,7 @@ using NLog.Fluent;
 
 namespace Lyralei.Bot
 {
-    public class ServerQueryBaseConnection : IDisposable
+    public class ServerQueryConnection : IDisposable
     {
         bool disposing = false;
         //private Logger logger = LogManager.GetCurrentClassLogger();
@@ -82,12 +82,12 @@ namespace Lyralei.Bot
             atd.Dispose();
         }
 
-        public ServerQueryBaseConnection()
+        public ServerQueryConnection()
         {
             logger = LogManager.GetLogger(this.GetType().Name);
         }
 
-        public ServerQueryBaseConnection(Models.Subscribers _subscriber, bool autoconnect = false)
+        public ServerQueryConnection(Models.Subscribers _subscriber, bool autoconnect = false)
         {
             logger = LogManager.GetLogger(this.GetType().Name);
 

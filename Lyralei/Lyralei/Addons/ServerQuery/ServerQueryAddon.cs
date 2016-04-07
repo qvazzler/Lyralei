@@ -25,7 +25,7 @@ namespace Lyralei.Addons.ServerQuery
 
         public void Initialize()
         {
-            this.serverQueryRootConnection.BotCommandAttemptReceived += onBotCommand;
+            this.ServerQueryConnection.BotCommandAttemptReceived += onBotCommand;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
         }
@@ -106,17 +106,17 @@ namespace Lyralei.Addons.ServerQuery
                     VirtualServerId = Subscriber.VirtualServerId,
                 };
 
-                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials);
+                ServerQueryConnection ServerQueryConnection = new ServerQueryConnection(subscriberUserCredentials);
 
-                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(ServerQueryConnection.InitializeQuiet));
                 thread.Start();
                 thread.Join();
 
                 try
                 {
-                    if (serverQueryUserConnection.atd.IsConnected)
+                    if (ServerQueryConnection.atd.IsConnected)
                     {
-                        var test = serverQueryUserConnection.whoAmI;
+                        var test = ServerQueryConnection.whoAmI;
 
                         if (test == null)
                             throw new Exception("Login failure");
@@ -127,8 +127,8 @@ namespace Lyralei.Addons.ServerQuery
                             db.ServerQueryUser.Add(sqUser);
                             db.SaveChanges();
 
-                            serverQueryUserConnection.Logout();
-                            serverQueryUserConnection.Disconnect();
+                            ServerQueryConnection.Logout();
+                            ServerQueryConnection.Disconnect();
 
                             //User successfully registered
                             TextReply(e.MessageInfo, "Successfully registered! You can now execute serverquery commands directly to me based on your user permissions.");
@@ -186,9 +186,9 @@ namespace Lyralei.Addons.ServerQuery
                                     VirtualServerId = Subscriber.VirtualServerId,
                                 };
 
-                                ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials);
+                                ServerQueryConnection ServerQueryConnection = new ServerQueryConnection(subscriberUserCredentials);
 
-                                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(ServerQueryConnection.InitializeQuiet));
                                 thread.Start();
 
                                 thread.Join();
@@ -200,9 +200,9 @@ namespace Lyralei.Addons.ServerQuery
 
                                 try
                                 {
-                                    if (serverQueryUserConnection.atd.IsConnected)
+                                    if (ServerQueryConnection.atd.IsConnected)
                                     {
-                                        var test = serverQueryUserConnection.whoAmI;
+                                        var test = ServerQueryConnection.whoAmI;
 
                                         if (test == null)
                                             throw new Exception("Login failed");
@@ -213,8 +213,8 @@ namespace Lyralei.Addons.ServerQuery
                                             db.ServerQueryUser.Add(sqUser);
                                             db.SaveChanges();
 
-                                            serverQueryUserConnection.queryRunner.Logout();
-                                            serverQueryUserConnection.atd.Disconnect();
+                                            ServerQueryConnection.queryRunner.Logout();
+                                            ServerQueryConnection.atd.Disconnect();
 
                                             //User successfully registered
                                             TextReply(e, "Successfully registered! You can now execute serverquery commands directly to me based on your user permissions.");
@@ -268,7 +268,7 @@ namespace Lyralei.Addons.ServerQuery
                         string result = SendServerQueryCommand(cmd, serverQueryUser);
 
                         //string result = SendServerQueryCommand(cmd, serverQueryUser);
-                        this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, result);
+                        this.ServerQueryConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, result);
                     }
                     catch (Exception ex)
                     {
@@ -294,13 +294,13 @@ namespace Lyralei.Addons.ServerQuery
                 VirtualServerId = Subscriber.VirtualServerId,
             };
 
-            using (ServerQueryUserConnection serverQueryUserConnection = new ServerQueryUserConnection(subscriberUserCredentials))
+            using (ServerQueryConnection ServerQueryConnection = new ServerQueryConnection(subscriberUserCredentials))
             {
-                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(serverQueryUserConnection.InitializeQuiet));
+                Thread thread = new Thread((ThreadStart)new SynchronizationCallback(ServerQueryConnection.InitializeQuiet));
                 thread.Start();
                 thread.Join();
 
-                var result = serverQueryUserConnection.queryRunner.SendCommand(cmd);
+                var result = ServerQueryConnection.queryRunner.SendCommand(cmd);
 
                 return result;
             }

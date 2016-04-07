@@ -47,7 +47,7 @@ namespace Lyralei.Bot
             {
                 //Log.Instance.Debug(subscriber.ServerIp + " - Connecting..");
                 logger.Debug("Connecting..");
-                ServerQueryRootConnection serverQueryConnection = new ServerQueryRootConnection(subscriber);
+                ServerQueryConnection serverQueryConnection = new ServerQueryConnection(subscriber);
 
                 serverQueryConnection.SetName("Lyralei");
 

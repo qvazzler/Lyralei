@@ -36,7 +36,7 @@ namespace Lyralei.Addons.InputOwner
 
         public void Initialize()
         {
-            this.serverQueryRootConnection.queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
+            this.ServerQueryConnection.queryRunner.Notifications.ClientMessageReceived += Notifications_ClientMessageReceived;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
 

@@ -21,8 +21,8 @@ namespace Lyralei.Addons.Test
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
 
             // Native serverquery events are in queryRunner object. Uncomment if you want to use them.
-            this.serverQueryRootConnection.BotCommandAttemptReceived += ServerQueryRootConnection_BotCommandReceived;
-            this.serverQueryRootConnection.queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
+            this.ServerQueryConnection.BotCommandAttemptReceived += ServerQueryConnection_BotCommandReceived;
+            this.ServerQueryConnection.queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
 
             logger.Debug("TestAddon initialized!");
         }
@@ -64,7 +64,7 @@ namespace Lyralei.Addons.Test
 
         }
 
-        private void ServerQueryRootConnection_BotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
+        private void ServerQueryConnection_BotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
             logger.Info("Command objects are tricky business! This command was: {0}", cmd[0].Name);
 
@@ -72,7 +72,7 @@ namespace Lyralei.Addons.Test
             {
                 // Both lines below do the same thing, but TextReply from the AddonBase class tries to make it more convenient for replies :-)
 
-                //this.serverQueryRootConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "That's a nice test you have there..");
+                //this.ServerQueryConnection.queryRunner.SendTextMessage(MessageTarget.Client, e.InvokerClientId, "That's a nice test you have there..");
                 TextReply(e, "That's a nice test you have there..");
 
                 CommandParameter someparam = null;

@@ -7,7 +7,7 @@ namespace Lyralei.Addons.Base
 {
     public interface IAddonBase
     {
-        void Configure(Models.Subscribers subscriber, ServerQueryRootConnection serverQueryRootConnection);
+        void Configure(Models.Subscribers subscriber, ServerQueryConnection ServerQueryConnection);
         event EventHandler<List<string>> InjectionRequest;
     }
 }

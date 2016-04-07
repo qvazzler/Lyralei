@@ -142,9 +142,7 @@
     <Compile Include="Bot\AddonQueryRunner.cs" />
     <Compile Include="CoreContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
-    <Compile Include="Bot\ServerQueryBaseConnection.cs" />
-    <Compile Include="Bot\ServerQueryUserConnection.cs" />
-    <Compile Include="Bot\ServerQueryRootConnection.cs" />
+    <Compile Include="Bot\ServerQueryConnection.cs" />
     <Compile Include="Bot\UserManager.cs" />
     <Compile Include="Migrations\20160323100840_Initial.cs" />
     <Compile Include="Migrations\20160323100840_Initial.designer.cs">

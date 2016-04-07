@@ -15,7 +15,7 @@ namespace Lyralei.Addons
     public class AddonManager
     {
         private Logger logger;
-        private Bot.ServerQueryRootConnection serverQueryRootConnection;
+        private Bot.ServerQueryConnection ServerQueryConnection;
         public List<IAddon> addons = new List<IAddon>();
 
         public delegate void BotCommandFail(object sender, FailedBotCommandEventArgs e);
@@ -37,12 +37,12 @@ namespace Lyralei.Addons
 
         CommandRuleSets commands = new CommandRuleSets();
 
-        public AddonManager(Models.Subscribers subscriber, Bot.ServerQueryRootConnection serverQueryRootConnection)
+        public AddonManager(Models.Subscribers subscriber, Bot.ServerQueryConnection ServerQueryConnection)
         {
             this.Subscriber = subscriber;
-            this.serverQueryRootConnection = serverQueryRootConnection;
+            this.ServerQueryConnection = ServerQueryConnection;
 
-            serverQueryRootConnection.BotCommandAttemptReceived += ServerQueryRootConnection_AttemptedBotCommandReceived;
+            ServerQueryConnection.BotCommandAttemptReceived += ServerQueryConnection_AttemptedBotCommandReceived;
 
             // Hard-coded for now..
             addons.Add(new InputOwner.InputOwnerAddon());
@@ -56,7 +56,7 @@ namespace Lyralei.Addons
             {
                 try
                 {
-                    addons[addonIndex].Configure(this.Subscriber, this.serverQueryRootConnection);
+                    addons[addonIndex].Configure(this.Subscriber, this.ServerQueryConnection);
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +133,7 @@ namespace Lyralei.Addons
             }
         }
 
-        private void ServerQueryRootConnection_AttemptedBotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
+        private void ServerQueryConnection_AttemptedBotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
         {
             //CommandParameterGroupExpectations verifiedCmd = (CommandParameterGroupExpectations)commands.SingleOrDefault(x => x.First().Name == cmd.First().Name);
 
