@@ -38,7 +38,6 @@ namespace Lyralei.Bot
         public BotConnection(Subscribers _subscriber)
         {
             Subscriber = _subscriber;
-
             Load();
         }
 
@@ -55,11 +54,24 @@ namespace Lyralei.Bot
                 serverQueryConnection.Initialize();
 
                 addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
+
+                addonManager.onBotCommand += AddonManager_onBotCommand;
+                addonManager.onFailedBotCommand += AddonManager_onFailedBotCommand;
             }
             catch (Exception ex)
             {
                 logger.Warn(ex, "Failed to connect.");
             }
+        }
+
+        private void AddonManager_onFailedBotCommand(object sender, TS3_Objects.EventArguments.FailedBotCommandEventArgs e)
+        {
+            logger.Debug("User {0} (ts3id: {1}) sent incorrect command: {2}", e.MessageDetails.InvokerNickname, e.MessageDetails.InvokerClientId, e.MessageDetails.Message);
+        }
+
+        private void AddonManager_onBotCommand(object sender, TS3_Objects.EventArguments.BotCommandEventArgs e)
+        {
+            logger.Debug("User {0} (ts3id: {1}) sent command: {2}", e.MessageDetails.InvokerNickname, e.MessageDetails.InvokerClientId, e.MessageDetails.Message);
         }
 
         void serverquery_ConnectionUp(object sender, EventArgs e)

@@ -11,6 +11,8 @@ using TS3QueryLib.Core.Server.Notification.EventArgs;
 
 using Microsoft.Data.Entity;
 using System.Threading;
+using Lyralei.TS3_Objects.Entities;
+using Lyralei.TS3_Objects.EventArguments;
 
 namespace Lyralei.Addons.InputOwner
 {
@@ -49,6 +51,11 @@ namespace Lyralei.Addons.InputOwner
         public void InitializeDependencies()
         {
             this.UpdateInjections();
+        }
+
+        public CommandRuleSets DefineCommandSchemas()
+        {
+            return null;
         }
 
         public void RequestInput(IAddon Addon, Lyralei.Models.Users user, int? inputWaitDuration = null, Props.ReleaseRequestAction releaseRequestAction = Props.ReleaseRequestAction.Ask, Props.QueuePosition queuePosition = Props.QueuePosition.Last)

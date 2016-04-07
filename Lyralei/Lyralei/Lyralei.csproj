@@ -171,6 +171,14 @@
     <Compile Include="Models\Users.cs" />
     <Compile Include="test.cs" />
     <Compile Include="TS3 Objects\Entities\Channel.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandWithRules.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandParameterWithRules.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandParameterGroupWithRules.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandParameterGroupListWithRules.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandRuleSet.cs" />
+    <Compile Include="TS3 Objects\Entities\CommandRuleSets.cs" />
+    <Compile Include="TS3 Objects\EventArguments\FailedBotCommandEventArgs.cs" />
+    <Compile Include="TS3 Objects\EventArguments\BotCommandEventArgs.cs" />
     <Compile Include="TS3 Objects\EventArguments\EventArguments.cs" />
     <Compile Include="Models\Subscribers.cs" />
     <Compile Include="Program.cs" />

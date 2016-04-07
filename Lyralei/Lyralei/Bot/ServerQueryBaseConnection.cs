@@ -43,8 +43,8 @@ namespace Lyralei.Bot
         public event StatusUpdateHandler ConnectionDown;
         public event StatusUpdateHandler ConnectionUp;
 
-        public delegate void BotCommandReceive(object sender, CommandParameterGroup cmd, MessageReceivedEventArgs e);
-        public event BotCommandReceive BotCommandReceived;
+        public delegate void BotCommandAttemptReceive(object sender, CommandParameterGroup cmd, MessageReceivedEventArgs e);
+        public event BotCommandAttemptReceive BotCommandAttemptReceived;
 
 
         //Needed stuff for connection
@@ -419,7 +419,7 @@ namespace Lyralei.Bot
                     var cmdPGL = CommandParameterGroupList.Parse(cmd);
 
                     foreach (CommandParameterGroup cmdPG in cmdPGL)
-                        BotCommandReceived.Invoke(this, cmdPG, e);
+                        BotCommandAttemptReceived.Invoke(this, cmdPG, e);
                 }
             }
         }

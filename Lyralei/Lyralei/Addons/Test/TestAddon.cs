@@ -1,4 +1,6 @@
 ﻿using Lyralei.Addons.Base;
+using Lyralei.TS3_Objects.Entities;
+using Lyralei.TS3_Objects.EventArguments;
 using NLog;
 using NLog.Fluent;
 using System;
@@ -19,7 +21,7 @@ namespace Lyralei.Addons.Test
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
 
             // Native serverquery events are in queryRunner object. Uncomment if you want to use them.
-            this.serverQueryRootConnection.BotCommandReceived += ServerQueryRootConnection_BotCommandReceived;
+            this.serverQueryRootConnection.BotCommandAttemptReceived += ServerQueryRootConnection_BotCommandReceived;
             this.serverQueryRootConnection.queryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
 
             logger.Debug("TestAddon initialized!");
@@ -31,6 +33,33 @@ namespace Lyralei.Addons.Test
         }
 
         public void InitializeDependencies()
+        {
+
+        }
+
+        public CommandRuleSets DefineCommandSchemas()
+        {
+            CommandRuleSets ruleSets = new CommandRuleSets();
+            CommandParameterGroupListWithRules cmds = new CommandParameterGroupListWithRules();
+
+            CommandParameterGroupWithRules cmdCool = new CommandParameterGroupWithRules();
+            cmdCool.Add(new CommandParameterWithRules("coolcommand")
+            {
+                IsBaseCommand = true
+            });
+            cmdCool.Add(new CommandParameterWithRules("someparam")
+            {
+                NameValueSetting = NameValueSetting.ValueOrValueAndName,
+                ValueType = TS3_Objects.Entities.ValueType.Integer,
+            });
+
+            cmds.Add(cmdCool);
+            ruleSets.Add(new CommandRuleSet(this.AddonName, cmds, Test));
+
+            return ruleSets;
+        }
+
+        public void Test(BotCommandEventArgs e)
         {
 
         }

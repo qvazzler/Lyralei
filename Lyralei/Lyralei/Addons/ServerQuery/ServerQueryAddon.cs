@@ -12,6 +12,8 @@ using TS3QueryLib.Core.Server.Notification.EventArgs;
 using Microsoft.Data.Entity;
 using System.Threading;
 using NLog.Fluent;
+using Lyralei.TS3_Objects.Entities;
+using Lyralei.TS3_Objects.EventArguments;
 
 namespace Lyralei.Addons.ServerQuery
 {
@@ -23,7 +25,7 @@ namespace Lyralei.Addons.ServerQuery
 
         public void Initialize()
         {
-            this.serverQueryRootConnection.BotCommandReceived += onBotCommand;
+            this.serverQueryRootConnection.BotCommandAttemptReceived += onBotCommand;
 
             ModelCustomizer.AddModelCustomization(Hooks.ModelCustomizer.OnModelCreating);
         }
@@ -38,6 +40,46 @@ namespace Lyralei.Addons.ServerQuery
             this.UpdateInjections();
 
             testAddon = (Test.TestAddon)GetDependencyReference("Test");
+        }
+
+        public CommandRuleSets DefineCommandSchemas()
+        {
+            CommandRuleSets ruleSets = new CommandRuleSets();
+            CommandParameterGroupListWithRules cmds = new CommandParameterGroupListWithRules();
+
+            CommandParameterGroupWithRules cmdCool = new CommandParameterGroupWithRules();
+            cmdCool.Add(new CommandParameterWithRules("serverquery")
+            {
+                IsBaseCommand = true
+            });
+            cmdCool.Add(new CommandParameterWithRules("register")
+            {
+                NameValueSetting = NameValueSetting.NameOnly,
+            });
+            cmdCool.Add(new CommandParameterWithRules("username")
+            {
+                NameValueSetting = NameValueSetting.ValueOrValueAndName,
+                Required = true,
+                Help = "Your ServerQuery username",
+                Nullable = false,
+            });
+            cmdCool.Add(new CommandParameterWithRules("password")
+            {
+                NameValueSetting = NameValueSetting.ValueOrValueAndName,
+                Required = true,
+                Help = "Your ServerQuery password",
+                Nullable = false,
+            });
+
+            cmds.Add(cmdCool);
+            ruleSets.Add(new CommandRuleSet(this.AddonName, cmds, ServerQueryUserRegistrationCommand));
+
+            return ruleSets;
+        }
+
+        public void ServerQueryUserRegistrationCommand(BotCommandEventArgs e)
+        {
+
         }
 
         private void onBotCommand(object sender, CommandParameterGroup cmdPG, MessageReceivedEventArgs e)
@@ -73,7 +115,7 @@ namespace Lyralei.Addons.ServerQuery
                                 };
 
                                 Lyralei.Models.Subscribers subscriberUserCredentials = new Lyralei.Models.Subscribers()
-                                    {
+                                {
                                     AdminPassword = sqUser.ServerQueryPassword,
                                     AdminUsername = sqUser.ServerQueryUsername,
                                     ServerIp = Subscriber.ServerIp,
