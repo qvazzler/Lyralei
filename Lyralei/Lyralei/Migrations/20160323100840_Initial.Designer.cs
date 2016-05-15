@@ -17,7 +17,7 @@ namespace Lyralei.Migrations
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Lyralei.Addons.ServerQuery.ServerQueryUser", b =>
+            modelBuilder.Entity("Lyralei.Core.ServerQuery.ServerQueryUser", b =>
                 {
                     b.ToTable("ServerQueryUser");
 

@@ -13,11 +13,11 @@ namespace Lyralei.TS3_Objects.Entities
     {
         public CommandParameterGroupListWithRules Commands;
         public Action<BotCommandEventArgs> Method;
-        public string AddonName;
+        public string CoreName;
 
-        public CommandRuleSet(string AddonName, CommandParameterGroupListWithRules Commands, Action<BotCommandEventArgs> Method)
+        public CommandRuleSet(string CoreName, CommandParameterGroupListWithRules Commands, Action<BotCommandEventArgs> Method)
         {
-            this.AddonName = AddonName;
+            this.CoreName = CoreName;
             this.Commands = Commands;
             this.Method = Method;
         }

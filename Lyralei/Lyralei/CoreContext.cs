@@ -8,8 +8,8 @@ namespace Lyralei
     {
         //public DbSet<Blog> Blog { get; set; }
         //public DbSet<Post> Posts { get; set; }
-        public DbSet<Models.Subscribers> Subscribers { get; set; }
-        public DbSet<Models.Users> Users { get; set; }
+        public DbSet<Core.ServerQueryConnection.Models.Subscribers> Subscribers { get; set; }
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -25,7 +25,7 @@ namespace Lyralei
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Make Blog.Url required
-            modelBuilder.Entity<Models.Subscribers>()
+            modelBuilder.Entity<Core.ServerQueryConnection.Models.Subscribers>()
                 .Property(b => b.ServerIp)
                 .IsRequired();
 

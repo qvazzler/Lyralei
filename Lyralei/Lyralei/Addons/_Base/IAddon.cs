@@ -1,19 +1,19 @@
-﻿using Lyralei.TS3_Objects.Entities;
-using Lyralei.TS3_Objects.EventArguments;
-using Microsoft.Data.Entity;
+﻿using Lyralei.Bot;
+using Lyralei.TS3_Objects.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Lyralei.Addons.Base
 {
-    public interface IAddon : IAddonBase
+    public interface IAddon : IComponentBase
     {
-        string AddonName { get; set; }
+        void UserInitialize(Bot.ComponentList ComponentList);
+        //string Name { get; set; }
 
-        void Initialize();
-        void DefineDependencies();
-        void InitializeDependencies();
-
+        // KEEP
         CommandRuleSets DefineCommandSchemas();
     }
 }

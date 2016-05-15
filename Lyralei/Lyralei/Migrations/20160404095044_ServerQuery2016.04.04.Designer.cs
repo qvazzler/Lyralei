@@ -17,7 +17,7 @@ namespace Lyralei.Migrations
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Lyralei.Addons.InputOwner.Models.InputOwners", b =>
+            modelBuilder.Entity("Lyralei.Core.InputOwner.Models.InputOwners", b =>
                 {
                     b.ToTable("InputOwners");
 
@@ -31,7 +31,7 @@ namespace Lyralei.Migrations
                     b.HasIndex("UserId");
                 });
 
-            modelBuilder.Entity("Lyralei.Addons.ServerQuery.Models.ServerQueryUser", b =>
+            modelBuilder.Entity("Lyralei.Core.ServerQuery.Models.ServerQueryUser", b =>
                 {
                     b.ToTable("ServerQueryUser");
 
@@ -49,7 +49,7 @@ namespace Lyralei.Migrations
                     b.HasIndex("UserId");
                 });
 
-            modelBuilder.Entity("Lyralei.Addons.Test.Models.TestUser", b =>
+            modelBuilder.Entity("Lyralei.Core.Test.Models.TestUser", b =>
                 {
                     b.ToTable("TestUser");
 
@@ -109,7 +109,7 @@ namespace Lyralei.Migrations
                     b.HasKey("UserId");
                 });
 
-            modelBuilder.Entity("Lyralei.Addons.InputOwner.Models.InputOwners", b =>
+            modelBuilder.Entity("Lyralei.Core.InputOwner.Models.InputOwners", b =>
                 {
                     b.HasOne("Lyralei.Models.Users")
                         .WithMany()
@@ -117,7 +117,7 @@ namespace Lyralei.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Lyralei.Addons.ServerQuery.Models.ServerQueryUser", b =>
+            modelBuilder.Entity("Lyralei.Core.ServerQuery.Models.ServerQueryUser", b =>
                 {
                     b.HasOne("Lyralei.Models.Users")
                         .WithMany()
@@ -125,7 +125,7 @@ namespace Lyralei.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Lyralei.Addons.Test.Models.TestUser", b =>
+            modelBuilder.Entity("Lyralei.Core.Test.Models.TestUser", b =>
                 {
                     b.HasOne("Lyralei.Models.Users")
                         .WithMany()

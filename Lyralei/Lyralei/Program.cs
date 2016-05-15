@@ -24,7 +24,6 @@ namespace Lyralei
 
         static void Main(string[] args)
         {
-            // directconnect host = localhost user = Adam pass = 39e7jMad port = 10011 virtualserverid = 1
             CommandParameterGroupList cmds;
             cmds = CommandParameterGroupList.Parse(String.Join(" ", args));
 
@@ -68,7 +67,7 @@ namespace Lyralei
                         var virtualServerId = cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value;
                         //bool save = cmd.SingleOrDefault(x => x.Name.ToLower() == "save").Value != "0";
 
-                        Models.Subscribers sub = new Models.Subscribers()
+                        Core.ServerQueryConnection.Models.Subscribers sub = new Core.ServerQueryConnection.Models.Subscribers()
                         {
                             ServerIp = serverIp,
                             AdminPassword = adminPassword,

@@ -14,7 +14,7 @@ using TS3QueryLib.Core.Server.Entities;
 using System.Threading;
 using System.Reflection;
 
-using Lyralei.Models;
+using Lyralei.Core.ServerQueryConnection.Models;
 using NLog;
 
 namespace Lyralei.Bot
@@ -33,35 +33,49 @@ namespace Lyralei.Bot
                 logger = LogManager.GetLogger(this.GetType().Name + " - " + subscriber.ToString());
             }
         }
-        Addons.AddonManager addonManager;
+        //Core.AddonManager.AddonManager AddonManager;
 
-        public BotConnection(Subscribers _subscriber)
+        public BotConnection(Subscribers Subscriber)
         {
-            Subscriber = _subscriber;
+            this.Subscriber = Subscriber;
             Load();
+        }
+
+        public void LoadEx()
+        {
+            try
+            {
+                Core.CoreManager.CoreManager CoreMgr = new Core.CoreManager.CoreManager(Subscriber);
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to instantiate connection");
+            }
         }
 
         public void Load()
         {
-            try
-            {
-                //Log.Instance.Debug(subscriber.ServerIp + " - Connecting..");
-                logger.Debug("Connecting..");
-                ServerQueryConnection serverQueryConnection = new ServerQueryConnection(subscriber);
+            LoadEx();
 
-                serverQueryConnection.SetName("Lyralei");
+            //try
+            //{
+            //    //Log.Instance.Debug(subscriber.ServerIp + " - Connecting..");
+            //    logger.Debug("Connecting..");
+            //    Core.ServerQueryConnection.ServerQueryConnection ServerQueryConnection = new Core.ServerQueryConnection.ServerQueryConnection(Subscriber);
 
-                serverQueryConnection.Initialize();
+            //    ServerQueryConnection.SetName("Lyralei");
 
-                addonManager = new Addons.AddonManager(subscriber, serverQueryConnection);
+            //    ServerQueryConnection.Initialize();
 
-                addonManager.onBotCommand += AddonManager_onBotCommand;
-                addonManager.onFailedBotCommand += AddonManager_onFailedBotCommand;
-            }
-            catch (Exception ex)
-            {
-                logger.Warn(ex, "Failed to connect.");
-            }
+            //    AddonManager = new Core.AddonManager.AddonManager(Subscriber, ServerQueryConnection);
+
+            //    AddonManager.onBotCommand += AddonManager_onBotCommand;
+            //    AddonManager.onFailedBotCommand += AddonManager_onFailedBotCommand;
+            //}
+            //catch (Exception ex)
+            //{
+            //    logger.Warn(ex, "Failed to connect.");
+            //}
         }
 
         private void AddonManager_onFailedBotCommand(object sender, TS3_Objects.EventArguments.FailedBotCommandEventArgs e)

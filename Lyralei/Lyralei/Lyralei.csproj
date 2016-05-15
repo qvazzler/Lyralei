@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoWarn>1591,1572</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -117,33 +118,55 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Addons\AddonManager.cs" />
-    <Compile Include="Addons\InputOwner\Base\IAddonWithInputNotifications.cs" />
-    <Compile Include="Addons\InputOwner\EventArguments\InputDetailsEventArgs.cs" />
-    <Compile Include="Addons\InputOwner\EventArguments\InputOwnerEventArgs.cs" />
-    <Compile Include="Addons\InputOwner\Hooks\CoreContext.cs" />
-    <Compile Include="Addons\InputOwner\Hooks\ModelCustomizer.cs" />
-    <Compile Include="Addons\InputOwner\Models\InputOwners.cs" />
-    <Compile Include="Addons\InputOwner\InputOwnerAddon.cs" />
-    <Compile Include="Addons\InputOwner\Props\QueuePosition.cs" />
-    <Compile Include="Addons\InputOwner\Props\InputReleaseRequestAction.cs" />
-    <Compile Include="Addons\ServerQuery\Hooks\CoreContext.cs" />
-    <Compile Include="Addons\ServerQuery\Hooks\ModelCustomizer.cs" />
-    <Compile Include="Addons\Test\Hooks\ModelCustomizer.cs" />
-    <Compile Include="Addons\Test\Hooks\CoreContext.cs" />
-    <Compile Include="Addons\Test\Models\TestUser.cs" />
+    <Compile Include="Addons\TestAddon\Hooks\CoreContext.cs" />
+    <Compile Include="Addons\TestAddon\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Addons\TestAddon\Models\TestUser.cs" />
+    <Compile Include="Addons\TestAddon\TestAddon.cs" />
     <Compile Include="Addons\_Base\AddonBase.cs" />
-    <Compile Include="Addons\_Base\IAddonBase.cs" />
     <Compile Include="Addons\_Base\IAddon.cs" />
-    <Compile Include="Addons\ServerQuery\ServerQueryAddon.cs" />
-    <Compile Include="Addons\Test\TestAddon.cs" />
-    <Compile Include="Addons\ServerQuery\Models\ServerQueryUser.cs" />
-    <Compile Include="BaseContext.cs" />
+    <Compile Include="Addons\_Base\IAddonBase.cs" />
+    <Compile Include="Bot\ComponentList.cs" />
+    <Compile Include="Bot\IComponentBase.cs" />
+    <Compile Include="Bot\IComponent.cs" />
+    <Compile Include="Core\AddonManager\AddonList.cs" />
+    <Compile Include="Core\AddonManager\AddonManager.cs" />
+    <Compile Include="Core\AddonManager\Props\AddonDependencies.cs" />
+    <Compile Include="Core\CoreManager\Hooks\CoreContext.cs" />
+    <Compile Include="Core\CoreManager\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\CoreManager\Props\CoreDependencies.cs" />
+    <Compile Include="Core\CoreManager\Props\CoreList.cs" />
+    <Compile Include="Core\CoreManager\CoreManager.cs" />
+    <Compile Include="Core\ServerQueryConnection\Hooks\CoreContext.cs" />
+    <Compile Include="Core\ServerQueryConnection\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\InputOwner\Base\IAddonWithInputNotifications.cs" />
+    <Compile Include="Core\InputOwner\EventArguments\InputDetailsEventArgs.cs" />
+    <Compile Include="Core\InputOwner\EventArguments\InputOwnerEventArgs.cs" />
+    <Compile Include="Core\InputOwner\Hooks\CoreContext.cs" />
+    <Compile Include="Core\InputOwner\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\InputOwner\Models\InputOwners.cs" />
+    <Compile Include="Core\InputOwner\InputOwnerAddon.cs" />
+    <Compile Include="Core\InputOwner\Props\QueuePosition.cs" />
+    <Compile Include="Core\InputOwner\Props\InputReleaseRequestAction.cs" />
+    <Compile Include="Core\ServerQueryShell\Hooks\CoreContext.cs" />
+    <Compile Include="Core\ServerQueryShell\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\Test\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\Test\Hooks\CoreContext.cs" />
+    <Compile Include="Core\Test\Models\TestUser.cs" />
+    <Compile Include="Core\ServerQueryShell\ServerQueryShell.cs" />
+    <Compile Include="Core\Test\TestAddon.cs" />
+    <Compile Include="Core\ServerQueryShell\Models\ServerQueryUser.cs" />
     <Compile Include="Bot\AddonQueryRunner.cs" />
     <Compile Include="CoreContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
-    <Compile Include="Bot\ServerQueryConnection.cs" />
-    <Compile Include="Bot\UserManager.cs" />
+    <Compile Include="Core\ServerQueryConnection\ServerQueryConnection.cs" />
+    <Compile Include="Core\AddonManager\Hooks\CoreContext.cs" />
+    <Compile Include="Core\AddonManager\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\UserManager\Hooks\CoreContext.cs" />
+    <Compile Include="Core\UserManager\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\UserManager\UserManager.cs" />
+    <Compile Include="Core\_Base\CoreBase.cs" />
+    <Compile Include="Core\_Base\ICore.cs" />
+    <Compile Include="Core\_Base\ICoreBase.cs" />
     <Compile Include="Migrations\20160323100840_Initial.cs" />
     <Compile Include="Migrations\20160323100840_Initial.designer.cs">
       <DependentUpon>20160323100840_Initial.cs</DependentUpon>
@@ -166,8 +189,7 @@
     </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />
-    <Compile Include="Models\Users.cs" />
-    <Compile Include="test.cs" />
+    <Compile Include="Core\UserManager\Models\Users.cs" />
     <Compile Include="TS3 Objects\Entities\Channel.cs" />
     <Compile Include="TS3 Objects\Entities\CommandWithRules.cs" />
     <Compile Include="TS3 Objects\Entities\CommandParameterWithRules.cs" />
@@ -178,7 +200,7 @@
     <Compile Include="TS3 Objects\EventArguments\FailedBotCommandEventArgs.cs" />
     <Compile Include="TS3 Objects\EventArguments\BotCommandEventArgs.cs" />
     <Compile Include="TS3 Objects\EventArguments\EventArguments.cs" />
-    <Compile Include="Models\Subscribers.cs" />
+    <Compile Include="Core\ServerQueryConnection\Models\Subscribers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleThreadSynchronizationContext.cs" />
@@ -193,7 +215,11 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Core\AddonManager\Models\" />
+    <Folder Include="Core\CoreManager\Models\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
