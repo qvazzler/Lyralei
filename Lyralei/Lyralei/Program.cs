@@ -65,6 +65,7 @@ namespace Lyralei
                         var adminUsername = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminusername").Value;
                         var serverPort = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverport").Value;
                         var virtualServerId = cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value;
+                        var subscriberUniqueId = cmd.SingleOrDefault(x => x.Name.ToLower() == "uniqueid").Value;
                         //bool save = cmd.SingleOrDefault(x => x.Name.ToLower() == "save").Value != "0";
 
                         Core.ServerQueryConnection.Models.Subscribers sub = new Core.ServerQueryConnection.Models.Subscribers()
@@ -74,6 +75,7 @@ namespace Lyralei
                             AdminUsername = adminUsername,
                             ServerPort = Convert.ToInt16(serverPort),
                             VirtualServerId = Convert.ToInt32(virtualServerId),
+                            SubscriberUniqueId = subscriberUniqueId
                         };
 
                         db.Subscribers.Add(sub);

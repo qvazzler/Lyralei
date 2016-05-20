@@ -187,6 +187,10 @@
     <Compile Include="Migrations\20160404095044_ServerQuery2016.04.04.designer.cs">
       <DependentUpon>20160404095044_ServerQuery2016.04.04.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20160520220609_SubscriberUniqueIdMod.cs" />
+    <Compile Include="Migrations\20160520220609_SubscriberUniqueIdMod.designer.cs">
+      <DependentUpon>20160520220609_SubscriberUniqueIdMod.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />
     <Compile Include="Core\UserManager\Models\Users.cs" />

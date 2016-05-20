@@ -9,7 +9,7 @@ namespace Lyralei
         //public DbSet<Blog> Blog { get; set; }
         //public DbSet<Post> Posts { get; set; }
         public DbSet<Core.ServerQueryConnection.Models.Subscribers> Subscribers { get; set; }
-        
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -29,6 +29,10 @@ namespace Lyralei
                 .Property(b => b.ServerIp)
                 .IsRequired();
 
+            modelBuilder.Entity<Core.ServerQueryConnection.Models.Subscribers>()
+                .HasIndex(b => b.SubscriberUniqueId)
+                .IsUnique();
+
             ModelCustomizer._modelCustomization.ForEach(x => x.Invoke(modelBuilder));
         }
     }
@@ -43,7 +47,7 @@ namespace Lyralei
 
         public static void Test<T>() where T : NLog.Logger
         {
-            
+
         }
 
         //Borked?

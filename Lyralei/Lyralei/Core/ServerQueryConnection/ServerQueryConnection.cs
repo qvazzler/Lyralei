@@ -21,7 +21,7 @@ namespace Lyralei.Core.ServerQueryConnection
 
         //Serverquery user information
         public WhoAmIResponse whoAmI;
-        //private string Name;
+        private string Nickname;
 
         //Command stuff
         public string commandPrefix;
@@ -62,8 +62,8 @@ namespace Lyralei.Core.ServerQueryConnection
 
         public void UserInitialize(CoreList AddonInjections)
         {
-            if (Name == null)
-                Name = Subscriber.AdminUsername;
+            if (Nickname == null)
+                Nickname = Subscriber.AdminUsername;
 
             this.connectionChange = new AutoResetEvent(false);
             AsyncTcpDispatcher = new AsyncTcpDispatcher(Subscriber.ServerIp, (ushort)Subscriber.ServerPort);
@@ -135,7 +135,7 @@ namespace Lyralei.Core.ServerQueryConnection
         {
             string result = "";
             int attempts = 1;
-            string modnickname = Name;
+            string modnickname = Nickname;
 
             do
             {
@@ -144,7 +144,7 @@ namespace Lyralei.Core.ServerQueryConnection
 
                 result = QueryRunner.SendCommand(cmd);
                 attempts += 1;
-                modnickname = Name + attempts;
+                modnickname = Nickname + attempts;
 
                 if (attempts > 100)
                     throw new Exception(result);
@@ -155,7 +155,7 @@ namespace Lyralei.Core.ServerQueryConnection
 
         public void SetName(string nickname)
         {
-            Name = nickname;
+            Nickname = nickname;
 
             try
             {

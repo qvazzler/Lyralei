@@ -37,7 +37,7 @@ namespace Lyralei.Addons.TestAddon
             this.ServerQueryAddon = ComponentList[typeof(Core.ServerQueryShell.ServerQueryShell).Name] as Core.ServerQueryShell.ServerQueryShell;
             this.testAddon = ComponentList[typeof(TestAddon).Name] as TestAddon;
 
-            // Native serverquery events are in queryRunner object. Uncomment if you want to use them.
+            // Native serverquery events are in queryRunner object.
             this.ServerQueryConnection.BotCommandAttempt += ServerQueryConnection_BotCommandReceived;
             this.ServerQueryConnection.QueryRunner.Notifications.ClientMoved += Notifications_ClientMoved;
         }

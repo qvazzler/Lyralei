@@ -28,24 +28,21 @@ namespace Lyralei.Core.Base
             }
         }
 
-        //public CoreBase()
-        //{
-        //    logger = LogManager.GetLogger(this.GetType().Name);
-        //}
-
         public CoreBase(Core.ServerQueryConnection.Models.Subscribers Subscriber)
         {
+            this.Name = this.GetType().Name;
+
             CoreDependencies = new CoreManager.CoreDependencies();
             AddonDependencies = new AddonManager.AddonDependencies();
             this.Subscriber = Subscriber;
         }
 
-        public void Initialize(CoreList AddonInjections)
+        public void Initialize(CoreList CoreInjections)
         {
             try
             {
                 var core = this as ICore;
-                core.UserInitialize(AddonInjections);
+                core.UserInitialize(CoreInjections);
 
                 this.IsInitialized = true;
                 logger.Debug(this.Name + " initialized successfully.");
