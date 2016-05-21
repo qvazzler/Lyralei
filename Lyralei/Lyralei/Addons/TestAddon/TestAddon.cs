@@ -57,6 +57,7 @@ namespace Lyralei.Addons.TestAddon
             CommandRuleSets ruleSets = new CommandRuleSets();
             CommandParameterGroupListWithRules cmds = new CommandParameterGroupListWithRules();
 
+            // This is a command with params
             CommandParameterGroupWithRules cmdCool = new CommandParameterGroupWithRules();
             cmdCool.Add(new CommandParameterWithRules("coolcommand")
             {
@@ -68,6 +69,15 @@ namespace Lyralei.Addons.TestAddon
                 ValueType = TS3_Objects.Entities.ValueType.Integer,
             });
 
+            cmds.Add(cmdCool);
+            ruleSets.Add(new CommandRuleSet(this.Name, cmds, Test));
+
+            // This is a command with params
+            CommandParameterGroupWithRules cmdKickall = new CommandParameterGroupWithRules();
+            cmdCool.Add(new CommandParameterWithRules("kickall")
+            {
+                IsBaseCommand = true
+            });
             cmds.Add(cmdCool);
             ruleSets.Add(new CommandRuleSet(this.Name, cmds, Test));
 
@@ -83,7 +93,13 @@ namespace Lyralei.Addons.TestAddon
         {
             logger.Info("Command objects are tricky business! This command was: {0}", cmd[0].Name);
 
-            if (cmd[0].Name.ToLower() == "test")
+            if (cmd[0].Name.ToLower() == "kickall")
+            {
+                ServerQueryConnection.QueryRunner.PokeClient(e.InvokerClientId, "Go away, that's dangerous");
+                ServerQueryConnection.QueryRunner.KickClient(e.InvokerClientId, KickReason.Server);
+                logger.Warn("That's some dangerous stuff, you better leave.");
+            }
+            else if (cmd[0].Name.ToLower() == "coolcommand")
             {
                 // Both lines below do the same thing, but ServerQueryConnection.TextReply from the AddonBase class tries to make it more convenient for replies :-)
 
