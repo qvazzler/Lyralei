@@ -39,6 +39,7 @@ namespace Lyralei
 
     public static class CoreContextUtils
     {
+
         //Model-cleaner
         public static void Clear<T>(this DbSet<T> dbSet) where T : class
         {

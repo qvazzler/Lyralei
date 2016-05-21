@@ -31,26 +31,19 @@ namespace Lyralei.Core.Base
         public CoreBase(Core.ServerQueryConnection.Models.Subscribers Subscriber)
         {
             this.Name = this.GetType().Name;
+            this.Subscriber = Subscriber;
 
             CoreDependencies = new CoreManager.CoreDependencies();
             AddonDependencies = new AddonManager.AddonDependencies();
-            this.Subscriber = Subscriber;
         }
 
         public void Initialize(CoreList CoreInjections)
         {
-            try
-            {
-                var core = this as ICore;
-                core.UserInitialize(CoreInjections);
+            var core = this as ICore;
+            core.UserInitialize(CoreInjections);
 
-                this.IsInitialized = true;
-                logger.Debug(this.Name + " initialized successfully.");
-            }
-            catch (Exception)
-            {
-
-            }
+            this.IsInitialized = true;
+            logger.Debug(this.Name + " initialized successfully.");
         }
     }
 }

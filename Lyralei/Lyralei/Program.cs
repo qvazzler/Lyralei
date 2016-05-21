@@ -60,25 +60,30 @@ namespace Lyralei
                 {
                     try
                     {
-                        var serverIp = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverip").Value;
-                        var adminPassword = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminpassword").Value;
-                        var adminUsername = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminusername").Value;
-                        var serverPort = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverport").Value;
-                        var virtualServerId = cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value;
-                        var subscriberUniqueId = cmd.SingleOrDefault(x => x.Name.ToLower() == "uniqueid").Value;
-                        //bool save = cmd.SingleOrDefault(x => x.Name.ToLower() == "save").Value != "0";
-
                         Core.ServerQueryConnection.Models.Subscribers sub = new Core.ServerQueryConnection.Models.Subscribers()
                         {
-                            ServerIp = serverIp,
-                            AdminPassword = adminPassword,
-                            AdminUsername = adminUsername,
-                            ServerPort = Convert.ToInt16(serverPort),
-                            VirtualServerId = Convert.ToInt32(virtualServerId),
-                            SubscriberUniqueId = subscriberUniqueId
+                            ServerIp = cmd.SingleOrDefault(x => x.Name.ToLower() == "serverip").Value,
+                            AdminPassword = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminpassword").Value,
+                            AdminUsername = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminusername").Value,
+                            ServerPort = Convert.ToInt16(cmd.SingleOrDefault(x => x.Name.ToLower() == "serverport").Value),
+                            VirtualServerId = Convert.ToInt32(cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value),
+                            SubscriberUniqueId = cmd.SingleOrDefault(x => x.Name.ToLower() == "uniqueid").Value
                         };
 
-                        db.Subscribers.Add(sub);
+                        var search = db.Subscribers.SingleOrDefault(x => x.SubscriberUniqueId == sub.SubscriberUniqueId && x.VirtualServerId == sub.VirtualServerId);
+
+                        if (search == null)
+                            db.Subscribers.Add(sub);
+                        else
+                        {
+                            search.ServerIp = sub.ServerIp;
+                            search.AdminPassword = sub.AdminPassword;
+                            search.AdminUsername = sub.AdminUsername;
+                            search.ServerPort = Convert.ToInt16(sub.ServerPort);
+                            search.VirtualServerId = Convert.ToInt32(sub.VirtualServerId);
+                            search.SubscriberUniqueId = sub.SubscriberUniqueId;
+                        }
+
                         var count = db.SaveChanges();
                         logger.Info("Subscriber {0} saved to database", sub.ToString(true));
                     }

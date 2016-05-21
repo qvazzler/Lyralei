@@ -136,6 +136,7 @@
     <Compile Include="Core\CoreManager\Props\CoreDependencies.cs" />
     <Compile Include="Core\CoreManager\Props\CoreList.cs" />
     <Compile Include="Core\CoreManager\CoreManager.cs" />
+    <Compile Include="Core\PermissionManager\Props\Permission.cs" />
     <Compile Include="Core\ServerQueryConnection\Hooks\CoreContext.cs" />
     <Compile Include="Core\ServerQueryConnection\Hooks\ModelCustomizer.cs" />
     <Compile Include="Core\InputOwner\Base\IAddonWithInputNotifications.cs" />
@@ -156,11 +157,15 @@
     <Compile Include="Core\Test\TestAddon.cs" />
     <Compile Include="Core\ServerQueryShell\Models\ServerQueryUser.cs" />
     <Compile Include="Bot\AddonQueryRunner.cs" />
-    <Compile Include="CoreContext.cs" />
+    <Compile Include="Contexts\CoreContext.cs" />
     <Compile Include="Bot\BotConnection.cs" />
     <Compile Include="Core\ServerQueryConnection\ServerQueryConnection.cs" />
     <Compile Include="Core\AddonManager\Hooks\CoreContext.cs" />
     <Compile Include="Core\AddonManager\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\PermissionManager\Hooks\CoreContext.cs" />
+    <Compile Include="Core\PermissionManager\Hooks\ModelCustomizer.cs" />
+    <Compile Include="Core\PermissionManager\Models\UserPermissions.cs" />
+    <Compile Include="Core\PermissionManager\PermissionManager.cs" />
     <Compile Include="Core\UserManager\Hooks\CoreContext.cs" />
     <Compile Include="Core\UserManager\Hooks\ModelCustomizer.cs" />
     <Compile Include="Core\UserManager\UserManager.cs" />
@@ -190,6 +195,10 @@
     <Compile Include="Migrations\20160520220609_SubscriberUniqueIdMod.cs" />
     <Compile Include="Migrations\20160520220609_SubscriberUniqueIdMod.designer.cs">
       <DependentUpon>20160520220609_SubscriberUniqueIdMod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160521121558_UserPermissions.cs" />
+    <Compile Include="Migrations\20160521121558_UserPermissions.designer.cs">
+      <DependentUpon>20160521121558_UserPermissions.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />

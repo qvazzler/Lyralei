@@ -45,6 +45,8 @@ namespace Lyralei.Core.CoreManager
             CoreList.Add(new InputOwner.InputOwnerAddon(this.Subscriber));
             CoreList.Add(new ServerQueryShell.ServerQueryShell(this.Subscriber));
             CoreList.Add(new AddonManager.AddonManager(this.Subscriber));
+            CoreList.Add(new PermissionManager.PermissionManager(this.Subscriber));
+
             //CoreList.Add(new AddonManager.AddonManager(this.Subscriber));
 
             InitializeCores();

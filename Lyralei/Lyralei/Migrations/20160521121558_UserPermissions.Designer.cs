@@ -8,9 +8,10 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(CoreContext))]
-    partial class CoreContextModelSnapshot : ModelSnapshot
+    [Migration("20160521121558_UserPermissions")]
+    partial class UserPermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
