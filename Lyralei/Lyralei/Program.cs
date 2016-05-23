@@ -32,6 +32,14 @@ namespace Lyralei
 
             List<BotConnection> botConnections = new List<BotConnection>();
 
+            ////DB connectionstring-adding, not a good option because it won't let you use Add-Migration / Update-Database
+            //var cmd_connectionstring = cmds.Where(cmdPG => cmdPG.Exists(cmdP => cmdP.Name == "connectionstring"));
+            //foreach (var cmd in cmd_connectionstring)
+            //{
+            //    CoreContext.connectionString = cmd.SingleOrDefault(x => x.Name.ToLower() == "connectionstring").Value;
+            //    string test2 = cmd.SingleOrDefault(x => x.Name.ToLower() == "connectionstring").EncodedValue;
+            //}
+
             using (var db = new CoreContext())
             {
                 //Database deletion switch
@@ -87,9 +95,9 @@ namespace Lyralei
                         var count = db.SaveChanges();
                         logger.Info("Subscriber {0} saved to database", sub.ToString(true));
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        logger.Warn("Failed to add a subscriber from command line");
+                        logger.Warn("Failed to add a subscriber from command line", ex);
                     }
                 }
 

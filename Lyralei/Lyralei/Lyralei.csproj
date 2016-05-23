@@ -200,6 +200,14 @@
     <Compile Include="Migrations\20160521121558_UserPermissions.designer.cs">
       <DependentUpon>20160521121558_UserPermissions.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20160523133737_SomeTest.cs" />
+    <Compile Include="Migrations\20160523133737_SomeTest.designer.cs">
+      <DependentUpon>20160523133737_SomeTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160523133911_SomeTest2.cs" />
+    <Compile Include="Migrations\20160523133911_SomeTest2.designer.cs">
+      <DependentUpon>20160523133911_SomeTest2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />
     <Compile Include="Core\UserManager\Models\Users.cs" />
