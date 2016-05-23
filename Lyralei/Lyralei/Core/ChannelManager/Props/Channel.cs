@@ -9,7 +9,7 @@ using TS3QueryLib.Core.Server;
 using TS3QueryLib.Core.Server.Responses;
 using TS3QueryLib.Core.Server.Entities;
 
-namespace Lyralei.TS3_Objects.Entities
+namespace Lyralei.Core.ChannelManager.Props
 {
     public class Channel
     {
@@ -305,7 +305,7 @@ namespace Lyralei.TS3_Objects.Entities
 
         public void Parse(string dumpString)
         {
-            string[] query = dumpString.Replace("\t", "").Split('\n');
+            string[] query = dumpString.Replace("\t", "").Replace("\r", "").Split('\n');
 
             #region Parsing
             try
@@ -318,7 +318,7 @@ namespace Lyralei.TS3_Objects.Entities
             try
             {
                 //ParentId -> ParentChannelId
-                ParentChannelId = (uint?)Int32.Parse(Array.Find(query, p => p.StartsWith("ParentId: ")).Replace("ParentId: ", ""));
+                ParentChannelId = (uint?)Int32.Parse(Array.Find(query, p => p.StartsWith("ParentChannelId: ")).Replace("ParentChannelId: ", ""));
             }
             catch (Exception) { }
 

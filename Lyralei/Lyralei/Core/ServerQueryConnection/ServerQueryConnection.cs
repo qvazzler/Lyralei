@@ -63,7 +63,12 @@ namespace Lyralei.Core.ServerQueryConnection
         public void UserInitialize(CoreList AddonInjections)
         {
             if (Nickname == null)
-                Nickname = Subscriber.AdminUsername;
+            {
+                if (this.Subscriber.BotNickName == null)
+                    Nickname = Subscriber.AdminUsername;
+                else
+                    Nickname = Subscriber.BotNickName;
+            }
 
             this.connectionChange = new AutoResetEvent(false);
             AsyncTcpDispatcher = new AsyncTcpDispatcher(Subscriber.ServerIp, (ushort)Subscriber.ServerPort);
@@ -399,8 +404,8 @@ namespace Lyralei.Core.ServerQueryConnection
                 {
                     string cmd = e.Message.Remove(0, 1);
 
+                    // Invoke the (now deprecated) BotCommandAttempt method
                     var cmdPGL = CommandParameterGroupList.Parse(cmd);
-
                     foreach (CommandParameterGroup cmdPG in cmdPGL)
                         BotCommandAttempt.Invoke(this, cmdPG, e);
                 }
@@ -457,7 +462,7 @@ namespace Lyralei.Core.ServerQueryConnection
 
         public CommandRuleSets DefineCommandSchemas()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         #endregion

@@ -26,6 +26,8 @@ namespace Lyralei.Core.ServerQueryConnection.Models
         [Required]
         public string AdminPassword { get; set; }
 
+        public string BotNickName { get; set; }
+
         public override string ToString()
         {
             return ToString(true);

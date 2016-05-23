@@ -34,22 +34,26 @@ namespace Lyralei.Core.CoreManager
             }
         }
 
+        ServerQueryConnection.ServerQueryConnection ServerQueryConnection;
+
         public CoreManager(ServerQueryConnection.Models.Subscribers Subscriber)
         {
             this.Subscriber = Subscriber;
             CoreList = new List<Base.ICore>();
 
-            CoreList.Add(new ServerQueryConnection.ServerQueryConnection(this.Subscriber));
+            CoreList.Add(ServerQueryConnection = new ServerQueryConnection.ServerQueryConnection(this.Subscriber));
             CoreList.Add(new UserManager.UserManager(this.Subscriber));
             //CoreList.Add(new Test.TestCore(this.Subscriber));
             CoreList.Add(new InputOwner.InputOwnerAddon(this.Subscriber));
             CoreList.Add(new ServerQueryShell.ServerQueryShell(this.Subscriber));
-            CoreList.Add(new AddonManager.AddonManager(this.Subscriber));
             CoreList.Add(new PermissionManager.PermissionManager(this.Subscriber));
-
-            //CoreList.Add(new AddonManager.AddonManager(this.Subscriber));
+            CoreList.Add(new ChannelManager.ChannelManager(this.Subscriber));
+            CoreList.Add(new AddonManager.AddonManager(this.Subscriber));
 
             InitializeCores();
+
+            GetSchemas();
+            ServerQueryConnection.BotCommandAttempt += onBotCommandAttempt;
         }
 
         private void onBotCommandAttempt(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
@@ -76,12 +80,12 @@ namespace Lyralei.Core.CoreManager
                 }
 
                 // Notify parent
-                onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
+                //onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
             }
             catch (Exception)
             {
-                // Notify parent
-                onFailedBotCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));
+                if (onFailedBotCommand != null)
+                    onFailedBotCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));
             }
         }
 

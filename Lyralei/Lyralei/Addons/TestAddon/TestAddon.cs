@@ -68,19 +68,17 @@ namespace Lyralei.Addons.TestAddon
                 NameValueSetting = NameValueSetting.ValueOrValueAndName,
                 ValueType = TS3_Objects.Entities.ValueType.Integer,
             });
-
             cmds.Add(cmdCool);
-            ruleSets.Add(new CommandRuleSet(this.Name, cmds, Test));
 
             // This is a command with params
             CommandParameterGroupWithRules cmdKickall = new CommandParameterGroupWithRules();
-            cmdCool.Add(new CommandParameterWithRules("kickall")
+            cmdKickall.Add(new CommandParameterWithRules("kickall")
             {
                 IsBaseCommand = true
             });
-            cmds.Add(cmdCool);
-            ruleSets.Add(new CommandRuleSet(this.Name, cmds, Test));
+            cmds.Add(cmdKickall);
 
+            ruleSets.Add(new CommandRuleSet(this.Name, cmds, Test));
             return ruleSets;
         }
 

@@ -18,12 +18,14 @@ namespace Lyralei.Core.AddonManager
         private CoreList CoreList;
 
         public delegate void BotCommandFail(object sender, FailedBotCommandEventArgs e);
-        public event BotCommandFail onFailedBotCommand;
+        public event BotCommandFail onFailedBotAddonCommand;
 
         public delegate void BotCommand(object sender, BotCommandEventArgs e);
         public event BotCommand onBotCommand;
 
         CommandRuleSets commands = new CommandRuleSets();
+
+        ServerQueryConnection.ServerQueryConnection ServerQueryConnection;
 
         public AddonManager(ServerQueryConnection.Models.Subscribers Subscriber) : base(Subscriber)
         {
@@ -33,19 +35,27 @@ namespace Lyralei.Core.AddonManager
 
             // Hard-coded for now..
             AddonList.Add(new Addons.TestAddon.TestAddon(this.Subscriber));
+            AddonList.Add(new Addons.Greeter.Greeter(this.Subscriber));
         }
 
         public void UserInitialize(CoreList CoreList)
         {
-            // Just give us _all_ the cores..
+            // Core Initialization
+            ServerQueryConnection = (ServerQueryConnection.ServerQueryConnection)CoreList["ServerQueryConnection"];
+
+            // Addon Initialization
+            // Just give us _all_ the cores (for now) so we can share them with the addons that need them
             this.CoreList = CoreList;
             // We can't initialize addons until the core addons have been initialized
             InitializeAddons();
+
+            GetSchemas();
+            ServerQueryConnection.BotCommandAttempt += onBotCommandAttempt;
         }
 
         public CommandRuleSets DefineCommandSchemas()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         private void onBotCommandAttempt(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)
@@ -72,12 +82,13 @@ namespace Lyralei.Core.AddonManager
                 }
 
                 // Notify parent
-                onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
+                //onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Notify parent
-                onFailedBotCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));
+                if (onFailedBotAddonCommand != null)
+                    onFailedBotAddonCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));
             }
         }
 

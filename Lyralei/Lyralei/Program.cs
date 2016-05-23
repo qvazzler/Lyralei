@@ -75,7 +75,8 @@ namespace Lyralei
                             AdminUsername = cmd.SingleOrDefault(x => x.Name.ToLower() == "adminusername").Value,
                             ServerPort = Convert.ToInt16(cmd.SingleOrDefault(x => x.Name.ToLower() == "serverport").Value),
                             VirtualServerId = Convert.ToInt32(cmd.SingleOrDefault(x => x.Name.ToLower() == "virtualserverid").Value),
-                            SubscriberUniqueId = cmd.SingleOrDefault(x => x.Name.ToLower() == "uniqueid").Value
+                            SubscriberUniqueId = cmd.SingleOrDefault(x => x.Name.ToLower() == "uniqueid").Value,
+                            BotNickName = cmd.SingleOrDefault(x => x.Name.ToLower() == "botnickname").Value
                         };
 
                         var search = db.Subscribers.SingleOrDefault(x => x.SubscriberUniqueId == sub.SubscriberUniqueId && x.VirtualServerId == sub.VirtualServerId);
@@ -90,6 +91,7 @@ namespace Lyralei
                             search.ServerPort = Convert.ToInt16(sub.ServerPort);
                             search.VirtualServerId = Convert.ToInt32(sub.VirtualServerId);
                             search.SubscriberUniqueId = sub.SubscriberUniqueId;
+                            search.BotNickName = sub.BotNickName;
                         }
 
                         var count = db.SaveChanges();
@@ -97,7 +99,7 @@ namespace Lyralei
                     }
                     catch (Exception ex)
                     {
-                        logger.Warn("Failed to add a subscriber from command line", ex);
+                        logger.Warn(ex, "Failed to add a subscriber from command line");
                     }
                 }
 
