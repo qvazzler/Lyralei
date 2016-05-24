@@ -8,9 +8,10 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(CoreContext))]
-    partial class CoreContextModelSnapshot : ModelSnapshot
+    [Migration("20160524214730_StoreChannelGroupClients2")]
+    partial class StoreChannelGroupClients2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
@@ -63,15 +64,15 @@ namespace Lyralei.Migrations
                     b.Property<int>("StoredChannelId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("ChannelIconId");
+                    b.Property<uint?>("ChannelIconId");
 
-                    b.Property<int?>("ChannelId");
+                    b.Property<uint?>("ChannelId");
 
-                    b.Property<short?>("Codec");
+                    b.Property<ushort?>("Codec");
 
                     b.Property<double?>("CodecQuality");
 
-                    b.Property<int?>("DeleteDelay");
+                    b.Property<uint?>("DeleteDelay");
 
                     b.Property<string>("Description");
 
@@ -79,7 +80,7 @@ namespace Lyralei.Migrations
 
                     b.Property<bool?>("ForcedSilence");
 
-                    b.Property<int?>("IconId");
+                    b.Property<uint?>("IconId");
 
                     b.Property<bool?>("IsDefaultChannel");
 
@@ -99,7 +100,7 @@ namespace Lyralei.Migrations
 
                     b.Property<bool?>("IsUnencrypted");
 
-                    b.Property<int?>("LatencyFactor");
+                    b.Property<uint?>("LatencyFactor");
 
                     b.Property<int?>("MaxClients");
 
@@ -107,13 +108,13 @@ namespace Lyralei.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int?>("NeededSubscribePower");
+                    b.Property<uint?>("NeededSubscribePower");
 
-                    b.Property<int?>("NeededTalkPower");
+                    b.Property<uint?>("NeededTalkPower");
 
-                    b.Property<int?>("Order");
+                    b.Property<uint?>("Order");
 
-                    b.Property<int?>("ParentChannelId");
+                    b.Property<uint?>("ParentChannelId");
 
                     b.Property<string>("PasswordHash");
 

@@ -32,10 +32,13 @@ namespace Lyralei.Core.ChannelManager
         public CommandRuleSets DefineCommandSchemas()
         {
             CommandRuleSets ruleSets = new CommandRuleSets();
-            CommandParameterGroupListWithRules cmds = new CommandParameterGroupListWithRules();
+            CommandParameterGroupListWithRules cmdsToSortSubChannels = new CommandParameterGroupListWithRules();
+            CommandParameterGroupListWithRules cmdsToStoreChannels = new CommandParameterGroupListWithRules();
+            CommandParameterGroupListWithRules cmdsToPopChannels = new CommandParameterGroupListWithRules();
 
-            CommandParameterGroupWithRules cmdCool = new CommandParameterGroupWithRules();
-            cmdCool.Add(new CommandParameterWithRules("sort")
+            // Sort channels based on parent channel
+            CommandParameterGroupWithRules cmdSortSubChannels = new CommandParameterGroupWithRules();
+            cmdSortSubChannels.Add(new CommandParameterWithRules("sort")
             {
                 IsBaseCommand = true
             });
@@ -44,8 +47,27 @@ namespace Lyralei.Core.ChannelManager
             //    NameValueSetting = NameValueSetting.ValueOrValueAndName,
             //    ValueType = TS3_Objects.Entities.ValueType.Integer,
             //});
-            cmds.Add(cmdCool);
-            ruleSets.Add(new CommandRuleSet(this.Name, cmds, UserSortRequest));
+            cmdsToSortSubChannels.Add(cmdSortSubChannels);
+
+            // Store a channel
+            CommandParameterGroupWithRules cmdStoreChannel = new CommandParameterGroupWithRules();
+            cmdStoreChannel.Add(new CommandParameterWithRules("store")
+            {
+                IsBaseCommand = true
+            });
+            cmdsToStoreChannels.Add(cmdStoreChannel);
+
+            // Pop a channel
+            CommandParameterGroupWithRules cmdPopChannel = new CommandParameterGroupWithRules();
+            cmdPopChannel.Add(new CommandParameterWithRules("pop")
+            {
+                IsBaseCommand = true
+            });
+            cmdsToPopChannels.Add(cmdPopChannel);
+
+            ruleSets.Add(new CommandRuleSet(this.Name, cmdsToSortSubChannels, UserSortRequest));
+            ruleSets.Add(new CommandRuleSet(this.Name, cmdsToStoreChannels, UserStoreChannelRequest));
+            ruleSets.Add(new CommandRuleSet(this.Name, cmdsToPopChannels, UserPopChannelRequest));
 
             return ruleSets;
         }
@@ -122,6 +144,38 @@ namespace Lyralei.Core.ChannelManager
             SortSubChannels((int)clientInfo.ChannelId);
         }
 
+        private void UserStoreChannelRequest(BotCommandEventArgs obj)
+        {
+            //No parameters, just need to store on the channel the user is in (for now).
+            try
+            {
+                var clientInfo = ServerQueryConnection.QueryRunner.GetClientInfo(obj.MessageInfo.InvokerClientId);
+                StoreChannel((int)clientInfo.ChannelId);
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to store channel by user {1} ({2})", obj.MessageInfo.InvokerClientId, obj.MessageInfo.InvokerNickname);
+            }
+        }
+
+        private void UserPopChannelRequest(BotCommandEventArgs obj)
+        {
+            //No parameters, for now
+            try
+            {
+                Models.StoredChannels firstStoredChannel;
+
+                using (var db = new CoreContext())
+                    firstStoredChannel = db.StoredChannels.First();
+
+                PopChannel((int)firstStoredChannel.ChannelId);
+            }
+            catch (Exception ex)
+            {
+                logger.Warn(ex, "Failed to pop channel by user {1} ({2})", obj.MessageInfo.InvokerClientId, obj.MessageInfo.InvokerNickname);
+            }
+        }
+
         #endregion
 
         public void SortSubChannels(int ParentChannelId)
@@ -155,6 +209,107 @@ namespace Lyralei.Core.ChannelManager
 
             for (int j = 0; j < channelEntries.Count; j++)
                 ServerQueryConnection.QueryRunner.EditChannel(channelEntries[j].ChannelId, channelModifications[j]);
+        }
+
+        public void StoreChannel(int ChannelId)
+        {
+            var channel = ServerQueryConnection.QueryRunner.GetChannelInfo((uint)ChannelId);
+
+            Models.StoredChannels storedChannel = new Models.StoredChannels(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId);
+            storedChannel.Parse(ChannelId, channel);
+
+            using (var db = new CoreContext())
+            {
+                // Store the channel
+                db.StoredChannels.Add(storedChannel);
+
+                // Store the channel group assignments
+                var channelGroupClients = ServerQueryConnection.QueryRunner.GetChannelGroupClientList((uint?)ChannelId, null, null).ToList();
+                foreach (var channelGroupClient in channelGroupClients)
+                {
+                    var storeChannel = new Models.StoredChannelGroupClients(Subscriber.SubscriberId, Subscriber.SubscriberUniqueId, channelGroupClient);
+                    db.StoredChannelGroupClients.Add(storeChannel);
+                }
+
+
+                // Successfully stored the channel, now we can delete it from the server
+                var response = ServerQueryConnection.QueryRunner.DeleteChannel((uint)ChannelId);
+
+                do
+                {
+                    if (response.IsErroneous)
+                    {
+                        if (response.ErrorMessage == "channel not empty")
+                        {
+                            var usersInChannel = ServerQueryConnection.QueryRunner.GetClientList(false).Where(client => client.ChannelId == ChannelId);
+
+                            foreach (var user in usersInChannel)
+                            {
+                                var kickResponse = ServerQueryConnection.QueryRunner.KickClient(user.ClientId, TS3QueryLib.Core.CommandHandling.KickReason.Channel, "Channel is being stored away.");
+
+                                if (kickResponse.IsErroneous)
+                                    throw new Exception(kickResponse.ResponseText + " (" + kickResponse.ErrorMessage + ")");
+
+                                response = ServerQueryConnection.QueryRunner.DeleteChannel((uint)ChannelId);
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception(response.ResponseText + " (" + response.ErrorMessage + ")");
+                        }
+                    }
+                } while (response.IsErroneous == true);
+
+                db.SaveChanges();
+            }
+        }
+
+        public void PopChannel(string StoredChannelUniqueId, int? ChannelParentId = null, int? ChannelOrder = null)
+        {
+            PopChannel(StoredChannelUniqueId, null, ChannelParentId, ChannelOrder);
+        }
+
+        public void PopChannel(int ChannelId, int? ChannelParentId = null, int? ChannelOrder = null)
+        {
+            PopChannel(null, ChannelId, ChannelParentId, ChannelOrder);
+        }
+
+        private void PopChannel(string StoredChannelUniqueId, int? ChannelId, int? ChannelParentId = null, int? ChannelOrder = null)
+        {
+            using (var db = new CoreContext())
+            {
+                // Remove the stored channel
+                Models.StoredChannels storedChannel;
+
+                if (ChannelId != null)
+                    storedChannel = db.StoredChannels.SingleOrDefault(channel => channel.ChannelId == ChannelId && channel.SubscriberId == this.Subscriber.SubscriberId);
+                else
+                    storedChannel = db.StoredChannels.SingleOrDefault(channel => channel.StoredChannelUniqueId == StoredChannelUniqueId && channel.SubscriberId == this.Subscriber.SubscriberId);
+
+                if (storedChannel == null)
+                    throw new Exception("Stored channel does not exist");
+
+                db.Remove(storedChannel);
+
+                // Create the new channel
+                var channelMod = storedChannel.ToChannelModification();
+
+                if (ChannelParentId != null)
+                    channelMod.ParentChannelId = (uint?)ChannelParentId;
+
+                if (ChannelOrder != null)
+                    channelMod.ChannelOrder = (uint?)ChannelOrder;
+
+                var createResponse = ServerQueryConnection.QueryRunner.CreateChannel(channelMod);
+
+                // TODO: INVALID PARAMETER???
+
+                if (createResponse.IsErroneous)
+                    throw new Exception("Could not pop stored channel: " + createResponse.ResponseText + " (" + createResponse.ErrorMessage + ")");
+
+                // Save changes
+                db.SaveChanges();
+            }
         }
     }
 }

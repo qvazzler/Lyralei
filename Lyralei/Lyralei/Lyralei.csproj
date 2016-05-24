@@ -134,6 +134,8 @@
     <Compile Include="Core\AddonManager\AddonList.cs" />
     <Compile Include="Core\AddonManager\AddonManager.cs" />
     <Compile Include="Core\AddonManager\Props\AddonDependencies.cs" />
+    <Compile Include="Core\ChannelManager\Models\StoredChannelGroupClients.cs" />
+    <Compile Include="Core\ChannelManager\Models\StoredChannels.cs" />
     <Compile Include="Core\ChannelManager\Utils\ChannelListEntryOrderComparer.cs" />
     <Compile Include="Core\CoreManager\Hooks\CoreContext.cs" />
     <Compile Include="Core\CoreManager\Hooks\ModelCustomizer.cs" />
@@ -219,6 +221,22 @@
     <Compile Include="Migrations\20160523193619_addNickNametoSubscribers.cs" />
     <Compile Include="Migrations\20160523193619_addNickNametoSubscribers.designer.cs">
       <DependentUpon>20160523193619_addNickNametoSubscribers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160524181230_StoreChannelGroupClients.cs" />
+    <Compile Include="Migrations\20160524181230_StoreChannelGroupClients.designer.cs">
+      <DependentUpon>20160524181230_StoreChannelGroupClients.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160524214730_StoreChannelGroupClients2.cs" />
+    <Compile Include="Migrations\20160524214730_StoreChannelGroupClients2.designer.cs">
+      <DependentUpon>20160524214730_StoreChannelGroupClients2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160524215059_StoreChannelGroupClients3.cs" />
+    <Compile Include="Migrations\20160524215059_StoreChannelGroupClients3.designer.cs">
+      <DependentUpon>20160524215059_StoreChannelGroupClients3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20160524215719_StoreChannelGroupClients4.cs" />
+    <Compile Include="Migrations\20160524215719_StoreChannelGroupClients4.designer.cs">
+      <DependentUpon>20160524215719_StoreChannelGroupClients4.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />

@@ -84,7 +84,7 @@ namespace Lyralei.Addons.TestAddon
 
         public void Test(BotCommandEventArgs e)
         {
-
+            
         }
 
         private void ServerQueryConnection_BotCommandReceived(object sender, TS3QueryLib.Core.CommandHandling.CommandParameterGroup cmd, TS3QueryLib.Core.Server.Notification.EventArgs.MessageReceivedEventArgs e)

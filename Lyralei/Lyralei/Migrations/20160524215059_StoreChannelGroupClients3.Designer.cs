@@ -8,9 +8,10 @@ using Lyralei;
 namespace Lyralei.Migrations
 {
     [DbContext(typeof(CoreContext))]
-    partial class CoreContextModelSnapshot : ModelSnapshot
+    [Migration("20160524215059_StoreChannelGroupClients3")]
+    partial class StoreChannelGroupClients3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc2-16649")
@@ -67,7 +68,7 @@ namespace Lyralei.Migrations
 
                     b.Property<int?>("ChannelId");
 
-                    b.Property<short?>("Codec");
+                    b.Property<ushort?>("Codec");
 
                     b.Property<double?>("CodecQuality");
 

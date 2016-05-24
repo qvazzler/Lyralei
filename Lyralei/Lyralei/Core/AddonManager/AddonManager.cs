@@ -76,16 +76,14 @@ namespace Lyralei.Core.AddonManager
                     // Invoke defined method linked to command
                     theSchema.Method.Invoke(new BotCommandEventArgs(theCmd, e));
                 }
-                else
-                {
-                    throw new Exception("Bot command does not exist");
-                }
 
                 // Notify parent
                 //onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
             }
             catch (Exception ex)
             {
+                logger.Warn(ex, "Command failed to execute");
+
                 // Notify parent
                 if (onFailedBotAddonCommand != null)
                     onFailedBotAddonCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));

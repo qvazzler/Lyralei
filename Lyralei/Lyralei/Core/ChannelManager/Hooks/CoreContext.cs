@@ -13,5 +13,7 @@ namespace Lyralei
     public partial class CoreContext : DbContext
     {
         public DbSet<Core.ChannelManager.Models.ChannelDesignations> ChannelDesignations { get; set; }
+        public DbSet<Core.ChannelManager.Models.StoredChannels> StoredChannels { get; set; }
+        public DbSet<Core.ChannelManager.Models.StoredChannelGroupClients> StoredChannelGroupClients { get; set; }
     }
 }

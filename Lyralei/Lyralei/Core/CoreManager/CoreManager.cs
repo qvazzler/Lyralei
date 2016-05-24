@@ -74,16 +74,14 @@ namespace Lyralei.Core.CoreManager
                     // Invoke defined method linked to command
                     theSchema.Method.Invoke(new BotCommandEventArgs(theCmd, e));
                 }
-                else
-                {
-                    throw new Exception("Bot command does not exist");
-                }
 
                 // Notify parent
                 //onBotCommand.Invoke(sender, new BotCommandEventArgs(theCmd, e));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.Warn(ex, "Command failed to execute");
+
                 if (onFailedBotCommand != null)
                     onFailedBotCommand.Invoke(sender, new FailedBotCommandEventArgs(cmd, e));
             }
@@ -159,7 +157,7 @@ namespace Lyralei.Core.CoreManager
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn(ex, "addon {0}: Could not load command schemas", CoreList[addonIndex].Name);
+                    logger.Error(ex, "addon {0}: Failed to load command schemas", CoreList[addonIndex].Name);
                 }
             }
         }
