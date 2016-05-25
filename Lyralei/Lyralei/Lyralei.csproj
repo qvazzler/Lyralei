@@ -241,7 +241,7 @@
     <Compile Include="Migrations\CoreContextModelSnapshot.cs" />
     <Compile Include="ModelCustomizer.cs" />
     <Compile Include="Core\UserManager\Models\Users.cs" />
-    <Compile Include="Core\ChannelManager\Props\Channel.cs" />
+    <Compile Include="Core\ChannelManager\Props\ChannelWithSubChannelsStorer.cs" />
     <Compile Include="TS3 Objects\Entities\CommandWithRules.cs" />
     <Compile Include="TS3 Objects\Entities\CommandParameterWithRules.cs" />
     <Compile Include="TS3 Objects\Entities\CommandParameterGroupWithRules.cs" />

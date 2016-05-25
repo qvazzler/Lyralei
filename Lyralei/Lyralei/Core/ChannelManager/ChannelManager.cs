@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using TS3QueryLib.Core.Common;
 using Lyralei.TS3_Objects.EventArguments;
 using TS3QueryLib.Core.Server.Entities;
+using TS3QueryLib.Core.Server.Responses;
+using TS3QueryLib.Core.Common.Responses;
 
 namespace Lyralei.Core.ChannelManager
 {
@@ -164,11 +166,26 @@ namespace Lyralei.Core.ChannelManager
             try
             {
                 Models.StoredChannels firstStoredChannel;
+                List<Models.StoredChannels> allChannelsUnderSameSubscriber;
 
                 using (var db = new CoreContext())
-                    firstStoredChannel = db.StoredChannels.First();
+                {
+                    allChannelsUnderSameSubscriber = db.StoredChannels.Where(x => x.SubscriberId == this.Subscriber.SubscriberId).ToList();
+                    firstStoredChannel = allChannelsUnderSameSubscriber.First(x => x.ChannelId == 18);
+                }
 
-                PopChannel((int)firstStoredChannel.ChannelId);
+                if (firstStoredChannel.ParentChannelId != 0)
+                {
+                    var parent = ServerQueryConnection.QueryRunner.GetChannelInfo((uint)firstStoredChannel.ParentChannelId);
+
+                    if (parent.IsErroneous)
+                        throw new Exception("Parent channel no longer exists");
+                }
+
+                Props.ChannelWithSubChannelsPackager ChannelWithSubChannels = new Props.ChannelWithSubChannelsPackager(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId);
+                ChannelWithSubChannels.Pop(allChannelsUnderSameSubscriber, firstStoredChannel, PopChannel);
+                
+                //PopChannel((int)firstStoredChannel.ChannelId);
             }
             catch (Exception ex)
             {
@@ -180,7 +197,7 @@ namespace Lyralei.Core.ChannelManager
 
         public void SortSubChannels(int ParentChannelId)
         {
-            List<Props.Channel> channels = new List<Props.Channel>();
+            List<Props.ChannelWithSubChannelsPackager> channels = new List<Props.ChannelWithSubChannelsPackager>();
             List<ChannelListEntry> channelEntries = new List<ChannelListEntry>();
 
             var tsChannels = ServerQueryConnection.QueryRunner.GetChannelList();
@@ -213,7 +230,20 @@ namespace Lyralei.Core.ChannelManager
 
         public void StoreChannel(int ChannelId)
         {
-            var channel = ServerQueryConnection.QueryRunner.GetChannelInfo((uint)ChannelId);
+            var ThisChannelInfo = ServerQueryConnection.QueryRunner.GetChannelInfo((uint)ChannelId);
+            Models.StoredChannels storedChannel = new Models.StoredChannels(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId);
+
+            List<ChannelListEntry> ChannelList = ServerQueryConnection.QueryRunner.GetChannelList(true).ToList();
+            ChannelListEntry ThisChannelEntry = ChannelList.SingleOrDefault(x => x.ChannelId == ChannelId);
+
+            Props.ChannelWithSubChannelsPackager ChannelWithSubChannels = new Props.ChannelWithSubChannelsPackager(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId);
+            ChannelWithSubChannels.Store(ServerQueryConnection.QueryRunner, ChannelList, ThisChannelInfo, ThisChannelEntry, StoreSingleChannel);
+        }
+
+        private void StoreSingleChannel(int ChannelId, ChannelInfoResponse ChannelInfo, ChannelListEntry Channel)
+        {
+            //var channel = ServerQueryConnection.QueryRunner.GetChannelInfo((uint)ChannelId);
+            var channel = ChannelInfo;
 
             Models.StoredChannels storedChannel = new Models.StoredChannels(this.Subscriber.SubscriberId, this.Subscriber.SubscriberUniqueId);
             storedChannel.Parse(ChannelId, channel);
@@ -274,7 +304,7 @@ namespace Lyralei.Core.ChannelManager
             PopChannel(null, ChannelId, ChannelParentId, ChannelOrder);
         }
 
-        private void PopChannel(string StoredChannelUniqueId, int? ChannelId, int? ChannelParentId = null, int? ChannelOrder = null)
+        private int PopChannel(string StoredChannelUniqueId, int? ChannelId, int? ChannelParentId = null, int? ChannelOrder = null)
         {
             using (var db = new CoreContext())
             {
@@ -294,21 +324,40 @@ namespace Lyralei.Core.ChannelManager
                 // Create the new channel
                 var channelMod = storedChannel.ToChannelModification();
 
+                if (channelMod.IconId == 0)
+                    channelMod.IconId = null;
+
                 if (ChannelParentId != null)
                     channelMod.ParentChannelId = (uint?)ChannelParentId;
 
                 if (ChannelOrder != null)
                     channelMod.ChannelOrder = (uint?)ChannelOrder;
 
-                var createResponse = ServerQueryConnection.QueryRunner.CreateChannel(channelMod);
+                SingleValueResponse<uint?> creationResponse = null;
 
-                // TODO: INVALID PARAMETER???
+                try
+                {
+                    //TODO: Fix the incorrect input format bug in ts3querylib
+                    creationResponse = ServerQueryConnection.QueryRunner.CreateChannel(channelMod);
 
-                if (createResponse.IsErroneous)
-                    throw new Exception("Could not pop stored channel: " + createResponse.ResponseText + " (" + createResponse.ErrorMessage + ")");
+                    if (creationResponse.IsErroneous)
+                        throw new Exception("Could not pop stored channel: " + creationResponse.ResponseText + " (" + creationResponse.ErrorMessage + ")");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message != "Input string was not in a correct format.")
+                    {
+                        // Uh oh, something else happened
+                        throw ex;
+                    }
+                }
+
+                if (creationResponse.Value == null)
+                    throw new Exception("Could not pop stored channel, no result given.");
 
                 // Save changes
                 db.SaveChanges();
+                return (int)creationResponse.Value; // Return the new channel id
             }
         }
     }

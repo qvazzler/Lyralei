@@ -195,7 +195,7 @@ namespace Lyralei.Core.ChannelManager.Models
             if (overWriteExisting || DeleteDelay == null)
                 DeleteDelay = (int?)info.DeleteDelay;
 
-            if (overWriteExisting || IconId == null)
+            if ((overWriteExisting || IconId == null) && info.IconId != 0)
                 IconId = (int?)info.IconId;
 
             if (overWriteExisting || LatencyFactor == null)
@@ -287,7 +287,7 @@ namespace Lyralei.Core.ChannelManager.Models
             if (overWriteExisting || DeleteDelay == null)
                 DeleteDelay = (int?)info.DeleteDelay;
 
-            if (overWriteExisting || IconId == null)
+            if ((overWriteExisting || IconId == null) && info.IconId != 0)
                 IconId = (int?)info.IconId;
 
             if (overWriteExisting || LatencyFactor == null)

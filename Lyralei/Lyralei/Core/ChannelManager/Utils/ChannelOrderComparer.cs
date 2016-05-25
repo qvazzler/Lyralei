@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Lyralei.Core.ChannelManager.Utils
 {
-    public class ChannelOrderComparer : IComparer<Props.Channel>
+    public class ChannelOrderComparer : IComparer<Props.ChannelWithSubChannelsPackager>
     {
-        public int Compare(Props.Channel x, Props.Channel y)
+        public int Compare(Props.ChannelWithSubChannelsPackager x, Props.ChannelWithSubChannelsPackager y)
         {
             string s1 = x.Name as string;
             if (s1 == null)
