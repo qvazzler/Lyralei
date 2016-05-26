@@ -171,7 +171,7 @@ namespace Lyralei.Core.ChannelManager
                 using (var db = new CoreContext())
                 {
                     allChannelsUnderSameSubscriber = db.StoredChannels.Where(x => x.SubscriberId == this.Subscriber.SubscriberId).ToList();
-                    firstStoredChannel = allChannelsUnderSameSubscriber.First(x => x.ChannelId == 18);
+                    firstStoredChannel = allChannelsUnderSameSubscriber.First(x => x.ChannelId == 52);
                 }
 
                 if (firstStoredChannel.ParentChannelId != 0)

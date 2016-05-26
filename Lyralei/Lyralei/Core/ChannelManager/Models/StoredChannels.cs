@@ -87,15 +87,17 @@ namespace Lyralei.Core.ChannelManager.Models
 
             //ForcedSilence
             channelMod.IsDefault = IsDefaultChannel;
+
             channelMod.HasUnlimitedMaxClients = IsMaxClientsUnlimited;
-            //HasIsMaxFamilyClientsInherited
+            channelMod.ArUnlimitedMaxFamilyClientsInherited = IsMaxFamilyClientsInherited;
             channelMod.HasUnlimitedMaxFamilyClients = IsMaxFamilyClientsUnlimited;
             channelMod.IsPermanent = IsPermanent;
             channelMod.IsSemiPermanent = IsSemiPermanent;
             //IsUnencrypted
             channelMod.CodecQuality = CodecQuality;
             channelMod.MaxClients = MaxClients;
-            channelMod.MaxFamilyClients = MaxFamilyClients;
+            if (MaxFamilyClients != -1)
+                channelMod.MaxFamilyClients = MaxFamilyClients;
             channelMod.Description = Description;
             //FilePath
             channelMod.Name = Name;

@@ -18,7 +18,7 @@ namespace Lyralei.Core.ChannelManager.Props
 
         public ChannelWithSubChannelsPackager(int SubscriberId, string SubscriberUniqueId) : base(SubscriberId, SubscriberUniqueId)
         {
-            
+
         }
 
         public ChannelWithSubChannelsPackager(int SubscriberId, string SubscriberUniqueId, QueryRunner QueryRunner, List<ChannelListEntry> ChannelList, ChannelInfoResponse ChannelInfo, ChannelListEntry Channel, Action<int, ChannelInfoResponse, ChannelListEntry> StoreMethod) : base(SubscriberId, SubscriberUniqueId)
@@ -37,8 +37,14 @@ namespace Lyralei.Core.ChannelManager.Props
             if (this.ChannelId == null)
                 Parse(Channel);
 
-            int changedChannelId = PopMethod.Invoke(null, this.ChannelId, null, null);
+            int changedChannelId = PopMethod.Invoke(null, this.ChannelId, Channel.ParentChannelId, Channel.Order);
 
+            // Change the underlying channel (if it exists) to align to the new channel id
+            var channelBeneath = StoredChannelList.SingleOrDefault(channel => channel.Order == Channel.ChannelId);
+            if (channelBeneath != null)
+                channelBeneath.Order = changedChannelId;
+
+            // Continue with the next channel(s)
             for (int i = 0; i < StoredChannelList.Count; i++)
             {
                 if (StoredChannelList[i].ParentChannelId == Channel.ChannelId)
